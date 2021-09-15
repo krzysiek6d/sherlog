@@ -6,9 +6,15 @@ MyTab::MyTab(QWidget *parent, const std::vector<QString>& fileContents) :
     ui(new Ui::MyTab)
 {
     ui->setupUi(this);
+
+    editor = new CodeEditor(this);
+    editor->setObjectName(QStringLiteral("textBrowser"));
+    ui->horizontalLayout->addWidget(editor);
+
     for(const auto& line: fileContents)
     {
-        ui->textBrowser->append(line);
+        //ui->textBrowser1->append(line);
+        editor->appendPlainText(line);
     }
 }
 

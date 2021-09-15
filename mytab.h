@@ -19,7 +19,7 @@ public:
     ~MyTab();
 
 private:
-    std::unique_ptr<CodeEditor> editor;
+    CodeEditor* editor;
     Ui::MyTab *ui;
 };
 
