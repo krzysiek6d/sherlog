@@ -7,39 +7,47 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>289</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>DejaVu Sans</family>
+    <pointsize>8</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <property name="leftMargin">
+    <number>2</number>
+   </property>
+   <property name="topMargin">
+    <number>2</number>
+   </property>
+   <property name="rightMargin">
+    <number>2</number>
+   </property>
+   <property name="bottomMargin">
+    <number>2</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="minimumSize">
         <size>
-         <width>300</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="sizeIncrement">
-        <size>
-         <width>0</width>
+         <width>180</width>
          <height>0</height>
         </size>
        </property>
        <property name="baseSize">
         <size>
-         <width>0</width>
+         <width>80</width>
          <height>0</height>
         </size>
        </property>
@@ -49,10 +57,10 @@
        <widget class="QLineEdit" name="lineEdit_2">
         <property name="geometry">
          <rect>
-          <x>80</x>
-          <y>30</y>
-          <width>91</width>
-          <height>21</height>
+          <x>10</x>
+          <y>50</y>
+          <width>101</width>
+          <height>25</height>
          </rect>
         </property>
        </widget>
@@ -72,6 +80,18 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>GroupBox</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLineEdit" name="lineEdit"/>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

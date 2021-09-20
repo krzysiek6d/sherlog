@@ -4,18 +4,15 @@
 #include <QTextStream>
 #include <iostream>
 #include <mytab.h>
+#include <tabwithfilename.h>
+#include <config.h>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->tabWidget->removeTab(0);
-    ui->tabWidget->removeTab(1);
-    ui->tabWidget->removeTab(2);
-//    logArea = std::make_unique<CodeEditor>(ui->horizontalLayoutWidget);
-//    logArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-//    logArea->adjustSize();
 }
 
 MainWindow::~MainWindow()
@@ -43,7 +40,7 @@ void MainWindow::on_actionOpen_triggered()
                fileContents.data.emplace_back(file.readLine());
             }
             filesContents.emplace_back(std::move(fileContents));
-            MyTab *tab = new MyTab(ui->tabWidget, filesContents.back());
+            tabWithFilename *tab = new tabWithFilename(ui->tabWidget, filesContents.back());
             ui->tabWidget->addTab(tab, tabName);
             file.close();
         }

@@ -52,6 +52,7 @@
 
 #include <QPainter>
 #include <QTextBlock>
+#include <config.h>
 
 //![constructor]
 
@@ -59,7 +60,9 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     lineNumberArea = new LineNumberArea(this);
-    setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+
+    setFont(Config::getFixedFont());
+    lineNumberArea->setFont(Config::getFixedFont());
 
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
