@@ -7,6 +7,7 @@
 
 CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}
 {
+    std::cout << "CodeEditor 1 " << std::endl;
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     lineNumberArea = new LineNumberArea(this);
 
@@ -25,12 +26,30 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
     setObjectName(QStringLiteral("textBrowser"));
 
+    std::cout << "CodeEditor 2 " << std::endl;
+
+    auto num = 0;
+    for (const auto& line: fileView)
+    {
+        lineNumbers.emplace_back(QString::number(++num) + " (" + QString::number(line->lineNum + 1) + ")");
+
+    }
+    std::cout << "CodeEditor 3 " << std::endl;
 
     for (const auto& line: fileView)
     {
-        appendPlainText((*line).second);
+        appendPlainText((*line).lineText);
     }
+    std::cout << "CodeEditor 4 " << std::endl;
+
     calculateLineNumberAreaWidth();
+    std::cout << "CodeEditor 5 " << std::endl;
+
+}
+
+void CodeEditor::prepareLineNumbers()
+{
+
 }
 
 void CodeEditor::calculateLineNumberAreaWidth()
@@ -38,7 +57,7 @@ void CodeEditor::calculateLineNumberAreaWidth()
     int digits = 1;
     if (!fileView.empty())
     {
-        QString lastEntry = QString::number(fileView.getNumOfLines()) + "(" + QString::number(fileView.back()->first) + ")";
+        QString lastEntry = QString::number(fileView.getNumOfLines()) + "(" + QString::number(fileView.back()->lineNum) + ")";
         digits = lastEntry.size();
     }
     auto font = Config::getFixedFont();
@@ -108,9 +127,9 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
-            //QString number = QString::number(blockNumber + 1);
+            QString number = lineNumbers[blockNumber];// QString::number(blockNumber + 1);
             // todo : optimize by having it in vector of qstrings
-            QString number = QString::number(blockNumber + 1) + "(" + QString::number(fileView[blockNumber]->first + 1) + ")";
+            //QString number = QString::number(blockNumber + 1) + "(" + QString::number(fileView[blockNumber]->lineNum + 1) + ")";
             painter.setPen(Qt::black);
             painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
                              Qt::AlignRight, number);

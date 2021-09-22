@@ -7,11 +7,17 @@
 #include <QFile>
 #include <iostream>
 
+struct Line
+{
+    int lineNum;
+    QString lineText;
+};
+
 struct FileContents
 {
     FileContents() {}
     QString filename;
-    std::map<int, QString> data;
+    std::vector<Line> data;
     QString getShortFilename()
     {
         std::cout << "len of filename: " << filename.size() << std::endl;
@@ -42,10 +48,10 @@ public:
 
     void filter(const QString& substring)
     {
-        std::vector<typename std::map<int, QString>::const_iterator> newVisibleLines;
+        std::vector<typename std::vector<Line>::const_iterator> newVisibleLines;
         for(auto it : visibleLines)
         {
-            const auto& line = it->second;
+            const auto& line = it->lineText;
             if (line.contains(substring))
             {
                 newVisibleLines.emplace_back(it);
@@ -89,7 +95,7 @@ public:
 private:
 
     const FileContents& fileContents;
-    std::vector<typename std::map<int, QString>::const_iterator> visibleLines;
+    std::vector<typename std::vector<Line>::const_iterator> visibleLines;
 };
 
 #endif // FILECONTENTS_H

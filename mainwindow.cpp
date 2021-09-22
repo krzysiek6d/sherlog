@@ -41,7 +41,8 @@ void MainWindow::on_actionOpen_triggered()
             {
                 QString line = file.readLine();
 
-               fileContents.data.insert(std::make_pair(lineNum, line.trimmed()));
+                Line l {lineNum, line.trimmed()};
+               fileContents.data.emplace_back(l);
                lineNum++;
             }
             filesContents.emplace_back(std::move(fileContents));

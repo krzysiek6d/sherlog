@@ -85,9 +85,12 @@ private slots:
 
 private:
     void calculateLineNumberAreaWidth();
+    void prepareLineNumbers();
     QWidget *lineNumberArea;
+
     const FileView& fileView;
     int lineNumberAreaWidth_;
+    std::vector<QString> lineNumbers;
 };
 
 //![codeeditordefinition]
