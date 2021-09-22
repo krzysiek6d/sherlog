@@ -4,12 +4,14 @@
 #include <config.h>
 
 
-TabContainer::TabContainer(QWidget *parent, const FileContents& fileContents, const QString& tabName) :
+TabContainer::TabContainer(QWidget *parent, const FileView& fileContents, const QString& tabName) :
     QWidget(parent),
     ui(new Ui::TabContainer)
 {
     ui->setupUi(this);
     setFont(Config::getNormalFont());
+
+    std::cout << "TabContainer ctor, FileView size: " << fileContents.getNumOfLines() << std::endl;
 
     ui->tabWidget->setFont(Config::getNormalFont());
     ui->tabWidget->setStyleSheet("QTabBar::tab { height: 22px; }");
@@ -21,7 +23,7 @@ TabContainer::~TabContainer()
     delete ui;
 }
 
-void TabContainer::addTab(const FileContents& fileContents, const std::vector<int>& lines, const QString& tabName)
+void TabContainer::addTab(const FileView& fileContents, const std::vector<int>& lines, const QString& tabName)
 {
     ui->tabWidget->addTab(new TabContainer(this, fileContents, "Base"), tabName);
 }

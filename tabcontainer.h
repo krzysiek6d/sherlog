@@ -13,8 +13,8 @@ class TabContainer : public QWidget
     Q_OBJECT
 
 public:
-    explicit TabContainer(QWidget *parent, const FileContents& fileContents, const QString& tabName);
-    void addTab(const FileContents& fileContents, const std::vector<int>& lines, const QString& tabName);
+    explicit TabContainer(QWidget *parent, const FileView& fileContents, const QString& tabName);
+    void addTab(const FileView& fileContents, const std::vector<int>& lines, const QString& tabName);
     ~TabContainer();
 
 private slots:

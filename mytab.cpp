@@ -7,7 +7,7 @@
 #include <config.h>
 
 
-MyTab::MyTab(TabContainer *parent, const FileContents& fileContents) :
+MyTab::MyTab(TabContainer *parent, const FileView& fileContents) :
     QWidget(parent),
     parent(parent),
     fileContents_{fileContents},
@@ -28,11 +28,10 @@ MyTab::MyTab(TabContainer *parent, const FileContents& fileContents) :
     editor->setObjectName(QStringLiteral("textBrowser"));
     ui->horizontalLayout->addWidget(editor);
 
-    for(const auto& line: fileContents.data)
+    for (const auto& line: fileContents)
     {
-        editor->appendPlainText(line);
+        editor->appendPlainText((*line).second);
     }
-
 
 }
 
@@ -55,5 +54,7 @@ void MyTab::on_lineEdit_2_returnPressed()
 void MyTab::on_lineEdit_returnPressed()
 {
     const auto& textToSearch = ui->lineEdit->text();
-    parent->addTab(fileContents_, {}, textToSearch);
+    FileView view = fileContents_;
+    view.filter(textToSearch);
+    parent->addTab(view, {}, textToSearch);
 }

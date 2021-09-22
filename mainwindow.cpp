@@ -28,6 +28,7 @@ void MainWindow::on_actionOpen_triggered()
     {
         std::cout << "opening " << filename.toStdString() << std::endl;
         QFile file{filename};
+
         if (file.open(QFileDevice::ReadOnly | QFileDevice::Text))
         {
             FileContents fileContents{};
@@ -35,9 +36,13 @@ void MainWindow::on_actionOpen_triggered()
             auto tabName = fileContents.getShortFilename();
             std::cout << "reading " << filename.toStdString() << std::endl;
             QTextStream in(&file);
+            int lineNum = 0;
             while (!in.atEnd())
             {
-               fileContents.data.emplace_back(file.readLine());
+                QString line = file.readLine();
+
+               fileContents.data.insert(std::make_pair(lineNum, line.trimmed()));
+               lineNum++;
             }
             filesContents.emplace_back(std::move(fileContents));
             tabWithFilename *tab = new tabWithFilename(ui->tabWidget, filesContents.back());

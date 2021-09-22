@@ -16,7 +16,9 @@ public:
     ~tabWithFilename();
 
 private:
+
     Ui::tabWithFilename *ui;
+    FileView fileView;
 };
 
 #endif // TABWITHFILENAME_H

@@ -18,7 +18,7 @@ class MyTab : public QWidget
 
 public:
     //explicit MyTab(QWidget *parent = 0, const std::vector<QString>& fileContents, const std::vector<int>& linesToShow);
-    explicit MyTab(TabContainer *parent, const FileContents& fileContents);
+    explicit MyTab(TabContainer *parent, const FileView& fileContents);
     ~MyTab();
 
 private slots:
@@ -28,7 +28,7 @@ private slots:
 
 private:
     TabContainer *parent;
-    const FileContents& fileContents_;
+    FileView fileContents_;
     CodeEditor* editor;
     Ui::MyTab *ui;
 };
