@@ -22,17 +22,9 @@ MyTab::MyTab(TabContainer *parent, const FileView& fileContents) :
     ui->lineEdit->setFont(Config::getNormalFont());
     ui->lineEdit_2->setFont(Config::getNormalFont());
 
-    editor = new CodeEditor(this);
-    editor->setReadOnly(true);
-    editor->setTextInteractionFlags(editor->textInteractionFlags() | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
-    editor->setObjectName(QStringLiteral("textBrowser"));
+    editor = new CodeEditor(this, fileContents_);
+
     ui->horizontalLayout->addWidget(editor);
-
-    for (const auto& line: fileContents)
-    {
-        editor->appendPlainText((*line).second);
-    }
-
 }
 
 MyTab::~MyTab()

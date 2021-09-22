@@ -65,6 +65,21 @@ public:
         return std::end(visibleLines);
     }
 
+    auto back() const
+    {
+        return visibleLines.back();
+    }
+
+    auto operator[](int k) const
+    {
+        return visibleLines[k];
+    }
+
+    auto empty() const
+    {
+        return visibleLines.empty();
+    }
+
     int getNumOfLines() const
     {
         return visibleLines.size();

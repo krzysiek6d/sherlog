@@ -52,6 +52,7 @@
 #define CODEEDITOR_H
 
 #include <QPlainTextEdit>
+#include "filecontents.h"
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -69,10 +70,10 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    CodeEditor(QWidget *parent = nullptr);
+    CodeEditor(QWidget *parent, const FileView& fileView);
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
-    int lineNumberAreaWidth();
+    int getLineNumberAreaWidth() const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -83,7 +84,10 @@ private slots:
     void updateLineNumberArea(const QRect &rect, int dy);
 
 private:
+    void calculateLineNumberAreaWidth();
     QWidget *lineNumberArea;
+    const FileView& fileView;
+    int lineNumberAreaWidth_;
 };
 
 //![codeeditordefinition]
@@ -97,7 +101,7 @@ public:
 
     QSize sizeHint() const override
     {
-        return QSize(codeEditor->lineNumberAreaWidth(), 0);
+        return QSize(codeEditor->getLineNumberAreaWidth(), 0);
     }
 
 protected:
