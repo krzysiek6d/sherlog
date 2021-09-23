@@ -41,7 +41,7 @@ void MainWindow::on_actionOpen_triggered()
             {
                 QString line = file.readLine();
 
-                Line l {lineNum, line.trimmed()};
+                Line l {lineNum, line};
                fileContents.data.emplace_back(l);
                lineNum++;
             }

@@ -40,36 +40,13 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     std::cout << "CodeEditor 3 " << std::endl;
 
 
-    if (fileView.getNumOfLines() > 1000)
-    {
         QString buf;
         for (auto i = 0; i < fileView.getNumOfLines(); i++)
         {
-            if (i%1000 == 0)
-            {
                 buf.append(fileView[i]->lineText);
-                appendPlainText(std::move(buf));
-                buf.clear();
-            }
-            else if (i == fileView.getNumOfLines() - 1)
-            {
-                buf.append(fileView[i]->lineText);
-            }
-            else
-            {
-                buf.append(fileView[i]->lineText + "\n");
-            }
         }
         appendPlainText(std::move(buf));
         buf.clear();
-    }
-    else
-    {
-        for (const auto& line: fileView)
-        {
-            appendPlainText(line->lineText);
-        }
-    }
 
 
 
@@ -160,7 +137,7 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
-            QString number = QString::number(blockNumber + 1);
+            QString number = "";
             if (blockNumber <lineNumbers.size())
                 number = lineNumbers[blockNumber];
             painter.setPen(Qt::black);
