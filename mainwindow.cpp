@@ -36,7 +36,7 @@ void MainWindow::on_actionOpen_triggered()
             auto tabName = fileContents.getShortFilename();
             std::cout << "reading " << filename.toStdString() << std::endl;
             QTextStream in(&file);
-            int lineNum = 0;
+            int lineNum = 1;
             while (!in.atEnd())
             {
                 QString line = file.readLine();
