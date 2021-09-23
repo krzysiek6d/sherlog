@@ -9,26 +9,23 @@
 CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}
 {
     MEASURE_FUNCTION();
-    std::cout << "CodeEditor 1 " << std::endl;
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
-    lineNumberArea = new LineNumberArea(this);
-
+    setReadOnly(true);
+    setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
+    setObjectName(QStringLiteral("textBrowser"));
     setFont(Config::getFixedFont());
+
+    lineNumberArea = new LineNumberArea(this);
     lineNumberArea->setFont(Config::getFixedFont());
 
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
 
-
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
+    calculateLineNumberAreaWidth();
 
-    setReadOnly(true);
-    setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
-    setObjectName(QStringLiteral("textBrowser"));
-
-    std::cout << "CodeEditor 2 " << std::endl;
 
     auto num = 0;
     for (const auto& line: fileView)
@@ -36,29 +33,14 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
         lineNumbers.emplace_back(QString::number(num + 1) + " (" + QString::number(line->lineNum) + ")");
         num++;
     }
-    std::cout << "lineNumbers.size() = " << lineNumbers.size();
-    std::cout << "CodeEditor 3 " << std::endl;
 
-
-        QString buf;
-        for (auto i = 0; i < fileView.getNumOfLines(); i++)
-        {
-                buf.append(fileView[i]->lineText);
-        }
-        appendPlainText(std::move(buf));
-        buf.clear();
-
-
-
-    std::cout << "CodeEditor 4 " << std::endl;
-
-    calculateLineNumberAreaWidth();
-    std::cout << "CodeEditor 5 " << std::endl;
-
-}
-
-void CodeEditor::prepareLineNumbers()
-{
+    QString buf;
+    for (auto i = 0; i < fileView.getNumOfLines(); i++)
+    {
+        buf.append(fileView[i]->lineText);
+    }
+    appendPlainText(std::move(buf));
+    buf.clear();
 
 }
 
@@ -108,18 +90,14 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
 void CodeEditor::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
+    QTextEdit::ExtraSelection selection;
 
-
-        QTextEdit::ExtraSelection selection;
-
-        QColor lineColor = QColor(Qt::yellow).lighter(160);
-
-        selection.format.setBackground(lineColor);
-        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-        selection.cursor = textCursor();
-        selection.cursor.clearSelection();
-        extraSelections.append(selection);
-
+    QColor lineColor = QColor(Qt::yellow).lighter(160);
+    selection.format.setBackground(lineColor);
+    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+    selection.cursor = textCursor();
+    selection.cursor.clearSelection();
+    extraSelections.append(selection);
 
     setExtraSelections(extraSelections);
 }

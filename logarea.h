@@ -85,7 +85,6 @@ private slots:
 
 private:
     void calculateLineNumberAreaWidth();
-    void prepareLineNumbers();
     QWidget *lineNumberArea;
 
     const FileView& fileView;
