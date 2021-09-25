@@ -5,6 +5,9 @@
 #include <config.h>
 #include <filecontents.h>
 #include "timer.h"
+#include <QShortcut>
+#include <QSyntaxHighlighter>
+#include <QRegularExpression>
 
 CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}
 {
@@ -14,6 +17,11 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     setTextInteractionFlags(textInteractionFlags() | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
     setObjectName(QStringLiteral("textBrowser"));
     setFont(Config::getFixedFont());
+    calculateLineNumberAreaWidth();
+
+    QShortcut *shortcutFind = new QShortcut(QKeySequence("Ctrl+m"), this); // rememver to delete
+    QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->highlightWords();});
+
 
     lineNumberArea = new LineNumberArea(this);
     lineNumberArea->setFont(Config::getFixedFont());
@@ -24,7 +32,6 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
-    calculateLineNumberAreaWidth();
 
 
     auto num = 0;
@@ -128,4 +135,63 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
         bottom = top + qRound(blockBoundingRect(block).height());
         ++blockNumber;
     }
+}
+
+
+void CodeEditor::highlightWords()
+{
+    MEASURE_FUNCTION();
+    auto selectedText = textCursor().selectedText();
+    std::cout << "selected text: " << selectedText.toStdString() << std::endl;
+
+    highlighter.reset(new MyHighlighter(document(), selectedText));
+
+//    QList<QTextEdit::ExtraSelection> extraSelections;
+
+
+
+
+
+//        moveCursor(QTextCursor::Start);
+//        QColor color = QColor(Qt::gray).lighter(130);
+
+//        while(find(selectedText))
+//        {
+//            QTextEdit::ExtraSelection extra;
+//            extra.format.setBackground(color);
+
+//            extra.cursor = textCursor();
+//            extraSelections.append(extra);
+//        }
+
+
+//    setExtraSelections(extraSelections);
+
+
+
+//    QList<QTextEdit::ExtraSelection> extraSelections;
+
+
+//        QTextEdit::ExtraSelection selection;
+
+//        QColor lineColor = QColor(Qt::yellow).lighter(160);
+
+//        selection.format.setBackground(lineColor);
+//        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+//        selection.cursor = textCursor();
+//        selection.cursor.clearSelection();
+//        extraSelections.append(selection);
+
+
+//    // BEGIN: added
+//    QTextCursor cursor = textCursor();
+//    cursor.select(QTextCursor::WordUnderCursor);
+//    QTextEdit::ExtraSelection currentWord;
+//    QColor redColor = Qt::red;
+//    currentWord.format.setBackground(redColor);
+//    currentWord.cursor = cursor;
+//    extraSelections.append(currentWord);
+//    // END: added
+
+//    setExtraSelections(extraSelections);
 }

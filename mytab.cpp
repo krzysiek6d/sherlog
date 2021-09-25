@@ -5,7 +5,7 @@
 #include <QTextBlock>
 #include <tabcontainer.h>
 #include <config.h>
-
+#include <QShortcut>
 
 MyTab::MyTab(TabContainer *parent, const FileView& fileContents) :
     QWidget(parent),
@@ -14,6 +14,11 @@ MyTab::MyTab(TabContainer *parent, const FileView& fileContents) :
     ui(new Ui::MyTab)
 {
     ui->setupUi(this);
+    QShortcut *shortcutGrep = new QShortcut(QKeySequence("Ctrl+g"), this); // rememver to delete
+    QObject::connect(shortcutGrep, &QShortcut::activated, [this](){this->openGrepDialog();});
+
+    QShortcut *shortcutFind = new QShortcut(QKeySequence("Ctrl+f"), this); // rememver to delete
+    QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->focusFind();});
 
     setFont(Config::getNormalFont());
     ui->groupBox->setFont(Config::getNormalFont());
@@ -49,4 +54,14 @@ void MyTab::on_lineEdit_returnPressed()
     FileView view = fileContents_;
     view.filter(textToSearch);
     parent->addTab(view, {}, textToSearch);
+}
+
+void MyTab::openGrepDialog()
+{
+    std::cout << "here grep dialog should be" << std::endl;
+}
+
+void MyTab::focusFind()
+{
+    ui->lineEdit->setFocus();
 }

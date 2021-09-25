@@ -53,6 +53,8 @@
 
 #include <QPlainTextEdit>
 #include "filecontents.h"
+#include "myhighlighter.h"
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -85,11 +87,13 @@ private slots:
 
 private:
     void calculateLineNumberAreaWidth();
+    void highlightWords();
     QWidget *lineNumberArea;
 
     const FileView& fileView;
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;
+    std::unique_ptr<MyHighlighter> highlighter;
 };
 
 //![codeeditordefinition]

@@ -27,6 +27,8 @@ private slots:
     void on_lineEdit_returnPressed();
 
 private:
+    void openGrepDialog();
+    void focusFind();
     TabContainer *parent;
     FileView fileContents_;
     CodeEditor* editor;
