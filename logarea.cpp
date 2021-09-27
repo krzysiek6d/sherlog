@@ -8,6 +8,9 @@
 #include <QShortcut>
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
+#include <algorithm>
+#include <ranges>
+#include <cassert>
 
 CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}
 {
@@ -18,6 +21,18 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     setObjectName(QStringLiteral("textBrowser"));
     setFont(Config::getFixedFont());
     calculateLineNumberAreaWidth();
+
+    availableColors.insert(std::make_pair(Qt::GlobalColor::lightGray, true));
+    availableColors.insert(std::make_pair(Qt::GlobalColor::green, true));
+    availableColors.insert(std::make_pair(Qt::GlobalColor::blue, true));
+    availableColors.insert(std::make_pair(Qt::GlobalColor::cyan, true));
+    availableColors.insert(std::make_pair(Qt::GlobalColor::red, true));
+    availableColors.insert(std::make_pair(Qt::GlobalColor::yellow, true));
+    availableColors.insert(std::make_pair(Qt::GlobalColor::darkYellow, true));
+
+
+
+
 
     QShortcut *shortcutFind = new QShortcut(QKeySequence("Ctrl+m"), this); // rememver to delete
     QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->highlightWords();});
@@ -141,10 +156,54 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 void CodeEditor::highlightWords()
 {
     MEASURE_FUNCTION();
-    auto selectedText = textCursor().selectedText();
+    auto selectedText = textCursor().selectedText().toLower();
+
+    auto it = std::find_if(highLightingPatterns.begin(), highLightingPatterns.end(),
+                           [&selectedText](auto & elem)
+    {
+        return selectedText == elem.first;
+    });
+    if (it != highLightingPatterns.end())
+    {
+        availableColors[it->second] = true;
+        highLightingPatterns.erase(it);
+    }
+    else
+    {
+        auto firstAvailableColorIt = std::find_if(availableColors.begin(), availableColors.end(),
+                                                [](const auto& elem){
+            return elem.second;
+        });
+        if (firstAvailableColorIt == availableColors.end())
+        {
+            assert(!highLightingPatterns.empty());
+            auto firstpattern = highLightingPatterns.begin();
+            availableColors[firstpattern->second] = true;
+            highLightingPatterns.erase(firstpattern);
+            firstAvailableColorIt = std::find_if(availableColors.begin(), availableColors.end(),
+                                                            [](const auto& elem){
+                        return elem.second;
+                    });
+        }
+        firstAvailableColorIt->second = false;
+        highLightingPatterns.push_back(std::make_pair(selectedText, firstAvailableColorIt->first));
+    }
     std::cout << "selected text: " << selectedText.toStdString() << std::endl;
 
-    highlighter.reset(new MyHighlighter(document(), selectedText));
+    highlighter.reset(new MyHighlighter(document(), highLightingPatterns));
+
+//    auto block = firstVisibleBlock();
+//    while (block.isValid() && block.isVisible())
+//    {
+//        auto blockNumber = block.blockNumber();
+//        std::cout << "block number is: " << blockNumber;
+//        highlighter->rehighlightBlock(block);
+//        block.userData();
+//        block = block.next();
+//    }
+
+
+    //highlighter->setDocument(document());
 
 //    QList<QTextEdit::ExtraSelection> extraSelections;
 

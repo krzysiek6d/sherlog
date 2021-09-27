@@ -4,26 +4,30 @@
 #include <QString>
 #include <QRegularExpression>
 #include <iostream>
+#include <vector>
+#include <set>
 
 class MyHighlighter : public QSyntaxHighlighter
 {
 public:
-    MyHighlighter(QTextDocument *parent, const QString& regex) : QSyntaxHighlighter(parent), regex{regex}
+    MyHighlighter(QTextDocument *parent, const std::vector<std::pair<QString, Qt::GlobalColor>>& regex) : QSyntaxHighlighter(parent), regex{regex}
     {}
     void highlightBlock(const QString &text)
     {
         //std::cout << "highlihging " << regex.toStdString() << std::endl;
-        QTextCharFormat myClassFormat;
-        myClassFormat.setFontWeight(QFont::Bold);
-        myClassFormat.setForeground(Qt::darkMagenta);
+        for (const auto& [pattern, color]: regex)
+        {
+            QTextCharFormat myClassFormat;
+            myClassFormat.setFontWeight(QFont::Bold);
+            myClassFormat.setBackground(color);
 
-        int j = 0;
+            int j = 0;
 
-        while ((j = text.indexOf(regex, j)) != -1) {
-            setFormat(j, regex.length(), myClassFormat);
-            ++j;
+            while ((j = text.indexOf(pattern, j, Qt::CaseInsensitive)) != -1) {
+                setFormat(j, pattern.length(), myClassFormat);
+                ++j;
+            }
         }
-
         /*QRegularExpression expression(regex);
         QRegularExpressionMatchIterator i = expression.globalMatch(text);
         while (i.hasNext())
@@ -37,7 +41,7 @@ public:
         std::cout << "destroying highlighter" << std::endl;
     }
 private:
-    QString regex;
+    std::vector<std::pair<QString, Qt::GlobalColor>> regex;
 };
 
 #endif // MYHIGHLIGHTER_H

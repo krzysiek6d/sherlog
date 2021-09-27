@@ -93,6 +93,8 @@ private:
     const FileView& fileView;
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;
+    std::map<Qt::GlobalColor, bool> availableColors;
+    std::vector<std::pair<QString, Qt::GlobalColor>> highLightingPatterns;
     std::unique_ptr<MyHighlighter> highlighter;
 };
 
