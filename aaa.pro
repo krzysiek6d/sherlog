@@ -35,13 +35,14 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
     logarea.h \
-    mytab.h \
     filecontents.h \
     tabwithfilename.h \
     tabcontainer.h \
     config.h \
     timer.h \
-    myhighlighter.h
+    myhighlighter.h \
+    mytab.h \
+    mytab.h
 
 FORMS += \
         mainwindow.ui \

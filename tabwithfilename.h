@@ -3,21 +3,32 @@
 
 #include <QWidget>
 #include <filecontents.h>
+#include <memory>
+#include <QListWidgetItem>
 namespace Ui {
 class tabWithFilename;
 }
 
-class tabWithFilename : public QWidget
+struct Bookmark
+{
+    int linenum;
+    QString text;
+};
+
+class TabWithFilename : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit tabWithFilename(QWidget *parent, const FileContents& fileContents);
-    ~tabWithFilename();
+    TabWithFilename(QWidget *parent, const FileContents& fileContents);
+    ~TabWithFilename();
+
+    void addBookmark(int num, const QString& text);
+    void deleteBookmark(int index);
 
 private:
-
-    Ui::tabWithFilename *ui;
+    std::vector<Bookmark> bookmarks;
+    std::unique_ptr<Ui::tabWithFilename> ui;
     FileView fileView;
 };
 

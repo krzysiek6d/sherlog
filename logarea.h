@@ -76,6 +76,8 @@ public:
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int getLineNumberAreaWidth() const;
+    int getCurrentLineNumber();
+    QString getSelectedText();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

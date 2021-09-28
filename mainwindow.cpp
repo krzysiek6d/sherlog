@@ -46,7 +46,7 @@ void MainWindow::on_actionOpen_triggered()
                lineNum++;
             }
             filesContents.emplace_back(std::move(fileContents));
-            tabWithFilename *tab = new tabWithFilename(ui->tabWidget, filesContents.back());
+            TabWithFilename *tab = new TabWithFilename(ui->tabWidget, filesContents.back());
             ui->tabWidget->addTab(tab, tabName);
             file.close();
         }

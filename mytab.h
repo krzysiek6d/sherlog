@@ -11,27 +11,30 @@ class MyTab;
 }
 
 class TabContainer;
+class TabWithFilename;
 
 class MyTab : public QWidget
 {
     Q_OBJECT
 
 public:
-    //explicit MyTab(QWidget *parent = 0, const std::vector<QString>& fileContents, const std::vector<int>& linesToShow);
-    explicit MyTab(TabContainer *parent, const FileView& fileContents);
+    MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents);
     ~MyTab();
 
 private slots:
-    void on_lineEdit_2_returnPressed();
-
-    void on_lineEdit_returnPressed();
+    void on_findInput_returnPressed();
+    void on_grepInput_returnPressed();
+    void on_gotoLineInput_returnPressed();
 
 private:
-    void openGrepDialog();
+    void focusGotoLine();
     void focusFind();
+    void focusGrep();
+    void bookmark();
     TabContainer *parent;
     FileView fileContents_;
     CodeEditor* editor;
+    TabWithFilename* tabWithFilename;
     Ui::MyTab *ui;
 };
 

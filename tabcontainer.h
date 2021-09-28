@@ -7,14 +7,16 @@
 namespace Ui {
 class TabContainer;
 }
+class TabWithFilename;
 
 class TabContainer : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit TabContainer(QWidget *parent, const FileView& fileContents, const QString& tabName);
+    explicit TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, const QString& tabName);
     void addTab(const FileView& fileContents, const std::vector<int>& lines, const QString& tabName);
+
     ~TabContainer();
 
 private slots:
@@ -22,6 +24,7 @@ private slots:
 
 private:
     Ui::TabContainer *ui;
+    TabWithFilename* tabWithFilename;
 };
 
 #endif // TABCONTAINER_H

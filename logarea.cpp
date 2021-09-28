@@ -152,6 +152,10 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 }
 
+QString CodeEditor::getSelectedText()
+{
+    return textCursor().selectedText();
+}
 
 void CodeEditor::highlightWords()
 {
@@ -253,4 +257,11 @@ void CodeEditor::highlightWords()
 //    // END: added
 
 //    setExtraSelections(extraSelections);
+}
+
+
+int CodeEditor::getCurrentLineNumber()
+{
+    QTextCursor cursor = textCursor();
+    return cursor.blockNumber();
 }
