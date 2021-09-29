@@ -16,16 +16,16 @@ MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileV
     ui(new Ui::MyTab)
 {
     ui->setupUi(this);
-    QShortcut *shortcutGrep = new QShortcut(QKeySequence("Ctrl+g"), this); // rememver to delete
+    QShortcut *shortcutGrep = new QShortcut(Config::grepShorcut(), this); // rememver to delete
     QObject::connect(shortcutGrep, &QShortcut::activated, [this](){this->focusGrep();});
 
-    QShortcut *shortcutFind = new QShortcut(QKeySequence("Ctrl+f"), this); // rememver to delete
+    QShortcut *shortcutFind = new QShortcut(Config::findShorcut(), this); // rememver to delete
     QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->focusFind();});
 
-    QShortcut *shortcutGoToLine = new QShortcut(QKeySequence("Ctrl+l"), this); // rememver to delete
+    QShortcut *shortcutGoToLine = new QShortcut(Config::gotoLineShorcut(), this); // rememver to delete
     QObject::connect(shortcutGoToLine, &QShortcut::activated, [this](){this->focusGotoLine();});
 
-    QShortcut *shortcutBookmark = new QShortcut(QKeySequence("Ctrl+b"), this); // rememver to delete
+    QShortcut *shortcutBookmark = new QShortcut(Config::bookmarkShorcut(), this); // rememver to delete
     QObject::connect(shortcutBookmark, &QShortcut::activated, [this](){this->bookmark();});
 
     setFont(Config::getNormalFont());

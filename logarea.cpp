@@ -34,7 +34,7 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
 
 
 
-    QShortcut *shortcutFind = new QShortcut(QKeySequence("Ctrl+m"), this); // rememver to delete
+    QShortcut *shortcutFind = new QShortcut(Config::markShorcut(), this); // rememver to delete
     QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->highlightWords();});
 
 
