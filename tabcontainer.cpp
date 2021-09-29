@@ -17,8 +17,9 @@ TabContainer::TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, co
 
     ui->tabWidget->setFont(Config::getNormalFont());
     ui->tabWidget->setStyleSheet("QTabBar::tab { height: 22px; }");
-    ui->tabWidget->addTab(new MyTab(this, tabWithFilename, fileContents), "Base");
 
+    auto baseTab = new MyTab(this, tabWithFilename, fileContents);  // deletion is done by tabcloserequest
+    ui->tabWidget->addTab(baseTab, "Base");
 }
 
 TabContainer::~TabContainer()
@@ -28,10 +29,11 @@ TabContainer::~TabContainer()
 
 void TabContainer::addTab(const FileView& fileContents, const std::vector<int>& lines, const QString& tabName)
 {
-    ui->tabWidget->addTab(new TabContainer(this, tabWithFilename, fileContents, "Base"), tabName);
+    ui->tabWidget->addTab(new TabContainer(this, tabWithFilename, fileContents, "Base"), tabName); // deletion is done by tabcloserequest
 }
 
 void TabContainer::on_tabWidget_tabCloseRequested(int index)
 {
+    ui->tabWidget->widget(index)->deleteLater();
     ui->tabWidget->removeTab(index);
 }

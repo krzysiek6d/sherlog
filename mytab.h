@@ -21,6 +21,11 @@ public:
     MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents);
     ~MyTab();
 
+    void showEvent( QShowEvent* event );
+    void paintEvent( QPaintEvent* event ) ;
+
+    void gotoLineInFile(int);
+
 private slots:
     void on_findInput_returnPressed();
     void on_grepInput_returnPressed();

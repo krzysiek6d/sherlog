@@ -29,7 +29,6 @@ MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileV
     QObject::connect(shortcutBookmark, &QShortcut::activated, [this](){this->bookmark();});
 
     setFont(Config::getNormalFont());
-    //ui->groupBox->setFont(Config::getNormalFont());
     ui->groupBox_2->setFont(Config::getNormalFont());
     ui->label->setFont(Config::getNormalFont());
     ui->grepInput->setFont(Config::getNormalFont());
@@ -41,8 +40,21 @@ MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileV
     ui->horizontalLayout->addWidget(editor);
 }
 
+void MyTab::showEvent( QShowEvent* event ) {
+    QWidget::showEvent( event );
+    tabWithFilename->setCurrentTab(this);
+}
+
+void MyTab::paintEvent( QPaintEvent* event ) {
+    QWidget::paintEvent( event );
+    tabWithFilename->setCurrentTab(this);
+}
+
+
 MyTab::~MyTab()
 {
+    std::cout << "deleting mytab" << std::endl;
+    tabWithFilename->setCurrentTab(nullptr);
     delete ui;
 }
 
@@ -96,4 +108,15 @@ void MyTab::bookmark()
     auto realnum = view[editor->getCurrentLineNumber()]->lineNum;
     std::cout << "real line number: " << realnum << std::endl;
     tabWithFilename->addBookmark(realnum, editor->getSelectedText());
+}
+
+void MyTab::gotoLineInFile(int lineNum)
+{
+    FileView view = fileContents_;
+    auto lineIt = std::lower_bound(view.begin(), view.end(), lineNum,
+                                   [](const auto& elem, const auto& elem2){return elem->lineNum < elem2;});
+    auto localLineNum = std::distance(view.begin(), lineIt);
+    std::cout << "want to go to line number in file : " << lineNum << ", this means: goto line in view: " << localLineNum << std::endl;
+    QTextCursor cursor(editor->document()->findBlockByLineNumber(localLineNum)); // ln-1 because line number starts from 0
+    editor->setTextCursor(cursor);
 }

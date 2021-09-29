@@ -10,15 +10,20 @@
 TabWithFilename::TabWithFilename(QWidget *parent, const FileContents& fileContents) :
     QWidget(parent),
     ui(new Ui::tabWithFilename),
-    fileView(fileContents)
+    fileView(fileContents),
+    currentTab(nullptr)
 {
     ui->setupUi(this);
     ui->lineEdit->setText(fileContents.filename);
     auto container = new TabContainer(this, this, fileView, "Base");
     ui->horizontalLayout->addWidget(container);
 
-    connect(ui->bookmarksList, &QListWidget::doubleClicked, [this, container](const QModelIndex &item){
+    connect(ui->bookmarksList, &QListWidget::doubleClicked, [this](const QModelIndex &item){
         std::cout << "item " << item.row() << " clicked!" << std::endl;
+        if (currentTab)
+        {
+            currentTab->gotoLineInFile(bookmarks[item.row()].linenum);
+        }
     });
     QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), ui->bookmarksList);
     connect(shortcut, &QShortcut::activated, [this](){
@@ -62,4 +67,9 @@ void TabWithFilename::deleteBookmark(int index)
         auto* item = new QListWidgetItem(bookmark.text);
         ui->bookmarksList->addItem(item);
     }
+}
+
+void TabWithFilename::setCurrentTab(MyTab* tab)
+{
+    currentTab = tab;
 }
