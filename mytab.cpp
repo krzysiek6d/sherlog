@@ -30,7 +30,9 @@ MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileV
 
     setFont(Config::getNormalFont());
     ui->groupBox_2->setFont(Config::getNormalFont());
-    ui->label->setFont(Config::getNormalFont());
+    ui->gotoLabel->setFont(Config::getNormalFont());
+    ui->greplabel->setFont(Config::getNormalFont());
+    ui->findLabel->setFont(Config::getNormalFont());
     ui->grepInput->setFont(Config::getNormalFont());
     ui->findInput->setFont(Config::getNormalFont());
     ui->gotoLineInput->setFont(Config::getNormalFont());
