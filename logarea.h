@@ -64,6 +64,7 @@ class QWidget;
 QT_END_NAMESPACE
 
 class LineNumberArea;
+class MyTab;
 
 //![codeeditordefinition]
 
@@ -72,7 +73,7 @@ class CodeEditor : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    CodeEditor(QWidget *parent, const FileView& fileView);
+    CodeEditor(MyTab *parent, const FileView& fileView);
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int getLineNumberAreaWidth() const;
@@ -94,6 +95,7 @@ private:
     void paintEvent(QPaintEvent* event);
     void mousePressEvent(QMouseEvent *event);
 
+    MyTab *parent;
     QWidget *lineNumberArea;
 
     const FileView& fileView;

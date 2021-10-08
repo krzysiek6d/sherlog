@@ -19,13 +19,14 @@ class MyTab : public QWidget
     Q_OBJECT
 
 public:
-    MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents);
+    MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, MyTab* filterSource);
     ~MyTab();
 
     void showEvent( QShowEvent* event );
     void paintEvent( QPaintEvent* event ) ;
 
     void gotoLineInFile(int);
+    void showLineInFilterSource(int);
 
 private slots:
     void on_grepInput_returnPressed();
@@ -42,6 +43,7 @@ private:
     CodeEditor* editor;
     TabWithFilename* tabWithFilename;
     Ui::MyTab *ui;
+    MyTab* filterSource_;
 };
 
 #endif // MYTAB_H

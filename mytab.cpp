@@ -10,12 +10,13 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents) :
+MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, MyTab* filterSource) :
     QWidget(parent),
     parent(parent),
     fileContents_{fileContents},
     tabWithFilename{tabWithFilename},
-    ui(new Ui::MyTab)
+    ui(new Ui::MyTab),
+    filterSource_{filterSource}
 {
     ui->setupUi(this);
     QShortcut *shortcutGrep = new QShortcut(Config::grepShorcut(), this); // rememver to delete
@@ -137,7 +138,7 @@ void MyTab::on_grepInput_returnPressed()
     FileView view = fileContents_;
     auto matchCase = this->ui->grepMatchCase->isChecked();
     view.filter(textToSearch, matchCase);
-    parent->addTab(view, {}, textToSearch);
+    parent->addTab(view, {}, textToSearch, this);
 }
 
 void MyTab::on_gotoLineInput_returnPressed()
@@ -172,4 +173,13 @@ void MyTab::gotoLineInFile(int lineNum)
     std::cout << "want to go to line number in file : " << lineNum << ", this means: goto line in view: " << localLineNum << std::endl;
     QTextCursor cursor(editor->document()->findBlockByLineNumber(localLineNum)); // ln-1 because line number starts from 0
     editor->setTextCursor(cursor);
+}
+
+void MyTab::showLineInFilterSource(int realnum)
+{
+    if (filterSource_)
+    {
+        filterSource_->parent->setActiveTab(filterSource_);
+        filterSource_->gotoLineInFile(realnum);
+    }
 }

@@ -15,8 +15,9 @@
 #include <future>
 #include <QTimer>
 #include <QScrollBar>
+#include <mytab.h>
 
-CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}, highlighter(nullptr)
+CodeEditor::CodeEditor(MyTab *parent, const FileView& fileView) : QPlainTextEdit(parent), parent{parent}, fileView{fileView}, highlighter(nullptr)
 {
     MEASURE_FUNCTION();
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -292,6 +293,7 @@ void CodeEditor::mousePressEvent(QMouseEvent *event)
         {
             auto realnum = fileView[getCurrentLineNumber()]->lineNum;
             std::cout << "line number " << realnum << " clicked" << std::endl;
+            parent->showLineInFilterSource(realnum);
         }
     }
 
