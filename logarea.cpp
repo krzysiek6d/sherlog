@@ -37,6 +37,9 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
 
     QShortcut *shortcutFind = new QShortcut(Config::markShorcut(), this); // rememver to delete
     QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->highlightWords();});
+    QShortcut *shortcutDelete = new QShortcut(QKeySequence(Qt::Key_Delete), this);
+    QObject::connect(shortcutDelete, &QShortcut::activated, [](){/*prevent crash*/});
+
 
 
     lineNumberArea = new LineNumberArea(this);
