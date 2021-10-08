@@ -92,6 +92,7 @@ private:
     void highlightWords();
     void fastHighlight();
     void paintEvent(QPaintEvent* event);
+    void mousePressEvent(QMouseEvent *event);
 
     QWidget *lineNumberArea;
 

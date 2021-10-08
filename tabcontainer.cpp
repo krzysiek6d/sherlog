@@ -20,6 +20,7 @@ TabContainer::TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, co
 
     auto baseTab = new MyTab(this, tabWithFilename, fileContents);  // deletion is done by tabcloserequest
     ui->tabWidget->addTab(baseTab, "Base");
+    ui->tabWidget->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 }
 
 TabContainer::~TabContainer()

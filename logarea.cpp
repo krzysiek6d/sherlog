@@ -281,3 +281,18 @@ int CodeEditor::getCurrentLineNumber()
     QTextCursor cursor = textCursor();
     return cursor.blockNumber();
 }
+
+void CodeEditor::mousePressEvent(QMouseEvent *event)
+{
+    QPlainTextEdit::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier)
+    {
+        std::cout << "ctrl + left click" << std::endl;
+        if (getCurrentLineNumber() < fileView.getNumOfLines())
+        {
+            auto realnum = fileView[getCurrentLineNumber()]->lineNum;
+            std::cout << "line number " << realnum << " clicked" << std::endl;
+        }
+    }
+
+}
