@@ -46,13 +46,14 @@ public:
         }
     }
 
-    void filter(const QString& substring)
+    void filter(const QString& substring, bool matchCase)
     {
         std::vector<typename std::vector<Line>::const_iterator> newVisibleLines;
+        Qt::CaseSensitivity cs = matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive;
         for(auto it : visibleLines)
         {
             const auto& line = it->lineText;
-            if (line.contains(substring))
+            if (line.contains(substring, cs))
             {
                 newVisibleLines.emplace_back(it);
             }

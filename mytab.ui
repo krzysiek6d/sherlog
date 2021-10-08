@@ -41,7 +41,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>GroupBox</string>
+      <string/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -67,6 +67,13 @@
         </item>
         <item>
          <widget class="QLineEdit" name="grepInput"/>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="grepMatchCase">
+          <property name="text">
+           <string>match case</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -94,6 +101,13 @@
         <item>
          <widget class="QLineEdit" name="findInput"/>
         </item>
+        <item>
+         <widget class="QCheckBox" name="findMatchCase">
+          <property name="text">
+           <string>match case</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -119,13 +133,32 @@
         </item>
         <item>
          <widget class="QLineEdit" name="gotoLineInput">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>100</width>
             <height>0</height>
            </size>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>

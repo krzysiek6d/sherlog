@@ -11,8 +11,11 @@
 #include <algorithm>
 #include <ranges>
 #include <cassert>
+#include <thread>
+#include <future>
+#include <QTimer>
 
-CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}
+CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}, highlighter(nullptr)
 {
     MEASURE_FUNCTION();
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -31,9 +34,6 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     availableColors.insert(std::make_pair(Qt::GlobalColor::darkYellow, true));
 
 
-
-
-
     QShortcut *shortcutFind = new QShortcut(Config::markShorcut(), this); // rememver to delete
     QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->highlightWords();});
 
@@ -47,7 +47,6 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
-
 
     auto num = 0;
     for (const auto& line: fileView)
@@ -63,7 +62,6 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     }
     appendPlainText(std::move(buf));
     buf.clear();
-
 }
 
 void CodeEditor::calculateLineNumberAreaWidth()
@@ -124,6 +122,68 @@ void CodeEditor::highlightCurrentLine()
     setExtraSelections(extraSelections);
 }
 
+void CodeEditor::fastHighlight()
+{
+
+    auto highlight = [this](QTextBlock blk, int num)
+    {
+        int i = 0;
+        while (blk.isValid() && i < num) {
+            highlighter->rehighlightBlock(blk);
+            i++;
+            blk = blk.next();
+        }
+    };
+
+    auto blk = firstVisibleBlock();
+    auto max = 200;
+
+    highlight(blk, max);
+//    QTimer::singleShot(2, [this, highlight]()
+//    {
+//        highlight(document()->firstBlock(), document()->blockCount());
+//    });
+    //highlight(document()->firstBlock(), document()->blockCount());
+
+
+    /////////////////////////////////////////
+//auto blk = firstVisibleBlock();
+//auto blk = document()->begin();
+
+//    auto max = 200;
+//    //auto max = blockCount();
+
+//    int i = 0;
+//    while (blk.isValid() && i < max) {
+
+//        auto text = blk.text();
+
+//        QTextCharFormat clearFormat;
+//        QTextCursor cursor(blk);
+//        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+//        cursor.setCharFormat(clearFormat);
+//        for (const auto& [pattern, color]: highLightingPatterns)
+//        {
+//            QTextCharFormat myClassFormat;
+//            myClassFormat.setFontWeight(QFont::Bold);
+//            myClassFormat.setBackground(color);
+
+//            int j = 0;
+//            while ((j = text.indexOf(pattern, j, Qt::CaseInsensitive)) != -1) {
+
+//                QTextCursor tempCursor(blk);
+//                tempCursor.setPosition(blk.begin().fragment().position() + j);
+//                tempCursor.setPosition(blk.begin().fragment().position() + j + pattern.length(), QTextCursor::KeepAnchor);
+//                tempCursor.setCharFormat(myClassFormat);
+//                ++j;
+//            }
+
+//        }
+//        i++;
+//        blk = blk.next();
+//    }
+
+}
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
@@ -194,69 +254,17 @@ void CodeEditor::highlightWords()
     }
     std::cout << "selected text: " << selectedText.toStdString() << std::endl;
 
-    highlighter.reset(new MyHighlighter(document(), highLightingPatterns));
+    if (!highlighter)
+        highlighter.reset(new MyHighlighter(document(), highLightingPatterns));
+    else
+    {
+        highlighter->setPatterns(highLightingPatterns);
+        highlighter->rehighlight();
+    }
 
-//    auto block = firstVisibleBlock();
-//    while (block.isValid() && block.isVisible())
-//    {
-//        auto blockNumber = block.blockNumber();
-//        std::cout << "block number is: " << blockNumber;
-//        highlighter->rehighlightBlock(block);
-//        block.userData();
-//        block = block.next();
-//    }
+    //fastHighlight();
 
 
-    //highlighter->setDocument(document());
-
-//    QList<QTextEdit::ExtraSelection> extraSelections;
-
-
-
-
-
-//        moveCursor(QTextCursor::Start);
-//        QColor color = QColor(Qt::gray).lighter(130);
-
-//        while(find(selectedText))
-//        {
-//            QTextEdit::ExtraSelection extra;
-//            extra.format.setBackground(color);
-
-//            extra.cursor = textCursor();
-//            extraSelections.append(extra);
-//        }
-
-
-//    setExtraSelections(extraSelections);
-
-
-
-//    QList<QTextEdit::ExtraSelection> extraSelections;
-
-
-//        QTextEdit::ExtraSelection selection;
-
-//        QColor lineColor = QColor(Qt::yellow).lighter(160);
-
-//        selection.format.setBackground(lineColor);
-//        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-//        selection.cursor = textCursor();
-//        selection.cursor.clearSelection();
-//        extraSelections.append(selection);
-
-
-//    // BEGIN: added
-//    QTextCursor cursor = textCursor();
-//    cursor.select(QTextCursor::WordUnderCursor);
-//    QTextEdit::ExtraSelection currentWord;
-//    QColor redColor = Qt::red;
-//    currentWord.format.setBackground(redColor);
-//    currentWord.cursor = cursor;
-//    extraSelections.append(currentWord);
-//    // END: added
-
-//    setExtraSelections(extraSelections);
 }
 
 

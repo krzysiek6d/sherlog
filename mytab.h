@@ -15,6 +15,7 @@ class TabWithFilename;
 
 class MyTab : public QWidget
 {
+    using FindBackward = bool;
     Q_OBJECT
 
 public:
@@ -27,11 +28,11 @@ public:
     void gotoLineInFile(int);
 
 private slots:
-    void on_findInput_returnPressed();
     void on_grepInput_returnPressed();
     void on_gotoLineInput_returnPressed();
 
 private:
+    void search(FindBackward);
     void focusGotoLine();
     void focusFind();
     void focusGrep();

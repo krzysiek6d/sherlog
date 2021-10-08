@@ -28,6 +28,16 @@ QKeySequence Config::findShorcut()
     return QKeySequence("Ctrl+f");
 }
 
+QKeySequence Config::findNextShorcut()
+{
+    return QKeySequence("Ctrl+n");
+}
+
+QKeySequence Config::findPrevShorcut()
+{
+    return QKeySequence("Ctrl+Shift+n");
+}
+
 QKeySequence Config::grepShorcut()
 {
     return QKeySequence("Ctrl+g");

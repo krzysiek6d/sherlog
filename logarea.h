@@ -90,6 +90,7 @@ private slots:
 private:
     void calculateLineNumberAreaWidth();
     void highlightWords();
+    void fastHighlight();
     QWidget *lineNumberArea;
 
     const FileView& fileView;

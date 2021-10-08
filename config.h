@@ -12,6 +12,8 @@ public:
     static QFont getNormalFont();
 
     static QKeySequence findShorcut();
+    static QKeySequence findNextShorcut();
+    static QKeySequence findPrevShorcut();
     static QKeySequence grepShorcut();
     static QKeySequence markShorcut();
     static QKeySequence gotoLineShorcut();

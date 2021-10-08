@@ -17,7 +17,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Pinta</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
