@@ -61,7 +61,7 @@
            </size>
           </property>
           <property name="text">
-           <string>grep: </string>
+           <string>filter: </string>
           </property>
          </widget>
         </item>

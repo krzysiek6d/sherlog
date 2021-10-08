@@ -17,7 +17,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Pinta</string>
+   <string>Sherlog</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">

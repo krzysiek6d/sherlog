@@ -14,6 +14,7 @@
 #include <thread>
 #include <future>
 #include <QTimer>
+#include <QScrollBar>
 
 CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEdit(parent), fileView{fileView}, highlighter(nullptr)
 {
@@ -45,6 +46,8 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
 
+
+
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
 
@@ -62,6 +65,11 @@ CodeEditor::CodeEditor(QWidget *parent, const FileView& fileView) : QPlainTextEd
     }
     appendPlainText(std::move(buf));
     buf.clear();
+
+    auto numOfBlocks = fileView.getNumOfLines() / 100 + 1;
+    highlightedBlocks = std::vector<int>(numOfBlocks, 0);
+
+    isHiglightingConnected = false;
 }
 
 void CodeEditor::calculateLineNumberAreaWidth()
@@ -124,65 +132,53 @@ void CodeEditor::highlightCurrentLine()
 
 void CodeEditor::fastHighlight()
 {
+    auto blk = firstVisibleBlock();
+    auto blkNum = blk.blockNumber();
+    blk = document()->findBlockByLineNumber(blkNum / 100 * 100);
+    auto max = 200;
 
-    auto highlight = [this](QTextBlock blk, int num)
+    if (highlightedBlocks[blkNum / 100] == 0 )
     {
+//        std::cout << "rehighlighting between " << blkNum << " and " << blkNum + 200 << " is needed -> " << blk.blockNumber() << " - " << blk.blockNumber() + 200 << std::endl;
+
+        highlightedBlocks[blkNum / 100] = 1;
+//        if (highLightingPatterns.empty())
+//            return;
+
         int i = 0;
-        while (blk.isValid() && i < num) {
-            highlighter->rehighlightBlock(blk);
+        while (blk.isValid() && i < max) {
+
+            auto text = blk.text();
+
+            QTextCharFormat clearFormat;
+            QTextCursor cursor(blk);
+            cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+            cursor.setCharFormat(clearFormat);
+            for (const auto& [pattern, color]: highLightingPatterns)
+            {
+                QTextCharFormat myClassFormat;
+                myClassFormat.setFontWeight(QFont::Bold);
+                myClassFormat.setBackground(color);
+
+                int j = 0;
+                while ((j = text.indexOf(pattern, j, Qt::CaseInsensitive)) != -1) {
+
+                    QTextCursor tempCursor(blk);
+                    tempCursor.setPosition(blk.begin().fragment().position() + j);
+                    tempCursor.setPosition(blk.begin().fragment().position() + j + pattern.length(), QTextCursor::KeepAnchor);
+                    tempCursor.setCharFormat(myClassFormat);
+                    ++j;
+                }
+
+            }
             i++;
             blk = blk.next();
         }
-    };
-
-    auto blk = firstVisibleBlock();
-    auto max = 200;
-
-    highlight(blk, max);
-//    QTimer::singleShot(2, [this, highlight]()
+    }
+//    else
 //    {
-//        highlight(document()->firstBlock(), document()->blockCount());
-//    });
-    //highlight(document()->firstBlock(), document()->blockCount());
-
-
-    /////////////////////////////////////////
-//auto blk = firstVisibleBlock();
-//auto blk = document()->begin();
-
-//    auto max = 200;
-//    //auto max = blockCount();
-
-//    int i = 0;
-//    while (blk.isValid() && i < max) {
-
-//        auto text = blk.text();
-
-//        QTextCharFormat clearFormat;
-//        QTextCursor cursor(blk);
-//        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-//        cursor.setCharFormat(clearFormat);
-//        for (const auto& [pattern, color]: highLightingPatterns)
-//        {
-//            QTextCharFormat myClassFormat;
-//            myClassFormat.setFontWeight(QFont::Bold);
-//            myClassFormat.setBackground(color);
-
-//            int j = 0;
-//            while ((j = text.indexOf(pattern, j, Qt::CaseInsensitive)) != -1) {
-
-//                QTextCursor tempCursor(blk);
-//                tempCursor.setPosition(blk.begin().fragment().position() + j);
-//                tempCursor.setPosition(blk.begin().fragment().position() + j + pattern.length(), QTextCursor::KeepAnchor);
-//                tempCursor.setCharFormat(myClassFormat);
-//                ++j;
-//            }
-
-//        }
-//        i++;
-//        blk = blk.next();
+//        std::cout << "rehighlighting between " << blkNum << " and " << blkNum + 200 << " is NOT needed" << std::endl;
 //    }
-
 }
 
 void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
@@ -254,19 +250,28 @@ void CodeEditor::highlightWords()
     }
     std::cout << "selected text: " << selectedText.toStdString() << std::endl;
 
-    if (!highlighter)
-        highlighter.reset(new MyHighlighter(document(), highLightingPatterns));
-    else
-    {
-        highlighter->setPatterns(highLightingPatterns);
-        highlighter->rehighlight();
-    }
-
-    //fastHighlight();
+//    if (!highlighter)
+//        highlighter.reset(new MyHighlighter(document(), highLightingPatterns));
+//    else
+//    {
+//        highlighter->setPatterns(highLightingPatterns);
+//        highlighter->rehighlight();
+//    }
 
 
+    isHiglightingConnected = true;
+
+    auto numOfBlocks = fileView.getNumOfLines() / 100 + 1;
+    highlightedBlocks = std::vector<int>(numOfBlocks, 0);
+
+    fastHighlight();
 }
 
+void CodeEditor::paintEvent( QPaintEvent* event ) {
+    QPlainTextEdit::paintEvent( event );
+    if (isHiglightingConnected)
+        fastHighlight();
+}
 
 int CodeEditor::getCurrentLineNumber()
 {

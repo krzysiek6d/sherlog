@@ -91,14 +91,19 @@ private:
     void calculateLineNumberAreaWidth();
     void highlightWords();
     void fastHighlight();
+    void paintEvent(QPaintEvent* event);
+
     QWidget *lineNumberArea;
 
     const FileView& fileView;
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;
+
     std::map<Qt::GlobalColor, bool> availableColors;
     std::vector<std::pair<QString, Qt::GlobalColor>> highLightingPatterns;
     std::unique_ptr<MyHighlighter> highlighter;
+    std::vector<int> highlightedBlocks;
+    bool isHiglightingConnected;
 };
 
 //![codeeditordefinition]
