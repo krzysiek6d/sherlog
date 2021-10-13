@@ -2,10 +2,10 @@
 #include "ui_tabcontainer.h"
 #include "mytab.h"
 #include <config.h>
-#include <tabwithfilename.h>
+#include <documenttab.h>
 
 
-TabContainer::TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, MyTab* filterSource) :
+TabContainer::TabContainer(QWidget *parent, DocumentTab* tabWithFilename, const FileView& fileContents, MyTab* filterSource) :
     QWidget(parent),
     ui(new Ui::TabContainer),
     tabWithFilename{tabWithFilename}
@@ -13,7 +13,7 @@ TabContainer::TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, co
     ui->setupUi(this);
     setFont(Config::getNormalFont());
 
-    std::cout << "TabContainer ctor, FileView size: " << fileContents.getNumOfLines() << std::endl;
+    std::cout << "TabContainer ctor, FileView size: " << fileContents.size() << std::endl;
 
     ui->tabWidget->setFont(Config::getNormalFont());
     ui->tabWidget->setStyleSheet("QTabBar::tab { height: 22px; }");
@@ -28,9 +28,10 @@ TabContainer::~TabContainer()
     delete ui;
 }
 
-void TabContainer::addTab(const FileView& fileContents, const std::vector<int>& lines, const QString& tabName, MyTab* filterSource)
+void TabContainer::addTab(const FileView& fileContents, const QString& tabName, MyTab* filterSource)
 {
-    ui->tabWidget->addTab(new TabContainer(this, tabWithFilename, fileContents, filterSource), tabName); // deletion is done by tabcloserequest
+    auto filteredTab = new TabContainer(this, tabWithFilename, fileContents, filterSource);
+    ui->tabWidget->addTab(filteredTab, tabName); // deletion is done by tabcloserequest
 }
 
 void TabContainer::on_tabWidget_tabCloseRequested(int index)

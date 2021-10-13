@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <iostream>
 #include <mytab.h>
-#include <tabwithfilename.h>
+#include <documenttab.h>
 #include <config.h>
 
 
@@ -26,29 +26,13 @@ void MainWindow::on_actionOpen_triggered()
     std::cout << "open clicked" << std::endl;
     for (auto&& filename: filenames)
     {
-        std::cout << "opening " << filename.toStdString() << std::endl;
-        QFile file{filename};
-
-        if (file.open(QFileDevice::ReadOnly | QFileDevice::Text))
+        FileContents fileContents{filename};
+        if (fileContents.read())
         {
-            FileContents fileContents{};
-            fileContents.filename = filename;
             auto tabName = fileContents.getShortFilename();
-            std::cout << "reading " << filename.toStdString() << std::endl;
-            QTextStream in(&file);
-            int lineNum = 1;
-            while (!in.atEnd())
-            {
-                QString line = file.readLine();
-
-                Line l {lineNum, line};
-               fileContents.data.emplace_back(l);
-               lineNum++;
-            }
             filesContents.emplace_back(std::move(fileContents));
-            TabWithFilename *tab = new TabWithFilename(ui->tabWidget, filesContents.back());
+            DocumentTab *tab = new DocumentTab(ui->tabWidget, filesContents.back());
             ui->tabWidget->addTab(tab, tabName);
-            file.close();
         }
     }
 }

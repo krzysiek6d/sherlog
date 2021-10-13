@@ -2,7 +2,6 @@
 
 #include <QPlainTextEdit>
 #include "filecontents.h"
-#include "myhighlighter.h"
 #include <memory>
 #include <QShortcut>
 
@@ -54,7 +53,6 @@ private:
 
     std::map<Qt::GlobalColor, bool> availableColors;
     std::vector<std::pair<QString, Qt::GlobalColor>> highLightingPatterns;
-    std::unique_ptr<MyHighlighter> highlighter;
     std::vector<int> highlightedBlocks;
     bool isHiglightingConnected;
 

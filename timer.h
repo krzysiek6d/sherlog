@@ -1,6 +1,6 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
+#include <iostream>
 #include <chrono>
 
 #define MEASURE_FUNCTION() Timer timer{__func__}
@@ -31,4 +31,3 @@ private:
     const char* function_name_{};
     const ClockType::time_point start_;
 };
-#endif // TIMER_H

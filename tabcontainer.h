@@ -8,7 +8,7 @@ namespace Ui {
 class TabContainer;
 
 }
-class TabWithFilename;
+class DocumentTab;
 class MyTab;
 
 class TabContainer : public QWidget
@@ -16,8 +16,8 @@ class TabContainer : public QWidget
     Q_OBJECT
 
 public:
-    explicit TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, MyTab* filterSource);
-    void addTab(const FileView& fileContents, const std::vector<int>& lines, const QString& tabName, MyTab* filterSource);
+    explicit TabContainer(QWidget *parent, DocumentTab* tabWithFilename, const FileView& fileContents, MyTab* filterSource);
+    void addTab(const FileView& fileContents, const QString& tabName, MyTab* filterSource);
     void setActiveTab(MyTab* tab);
     ~TabContainer();
 
@@ -26,7 +26,7 @@ private slots:
 
 private:
     Ui::TabContainer *ui;
-    TabWithFilename* tabWithFilename;
+    DocumentTab* tabWithFilename;
 };
 
 #endif // TABCONTAINER_H

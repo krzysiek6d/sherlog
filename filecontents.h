@@ -6,6 +6,7 @@
 #include <string>
 #include <QFile>
 #include <iostream>
+#include <QTextStream>
 
 struct Line
 {
@@ -13,25 +14,61 @@ struct Line
     QString lineText;
 };
 
-struct FileContents
+class FileContents
 {
-    FileContents() {}
-    QString filename;
-    std::vector<Line> data;
+public:
+    FileContents(QString filename) : filename_{std::move(filename)}
+    {
+    }
+
+    bool read()
+    {
+        std::cout << "opening " << filename_.toStdString() << std::endl;
+        QFile file{filename_};
+
+        if (file.open(QFileDevice::ReadOnly | QFileDevice::Text))
+        {
+            std::cout << "reading " << filename_.toStdString() << std::endl;
+            QTextStream in(&file);
+            int lineNum = 1;
+            while (!in.atEnd())
+            {
+                QString line = file.readLine();
+                Line l {lineNum, line};
+                data_.emplace_back(l);
+                lineNum++;
+            }
+            file.close();
+            return true;
+        }
+        return false;
+    }
+
     QString getShortFilename()
     {
-        std::cout << "len of filename: " << filename.size() << std::endl;
-        auto file = filename.toStdString();
-        std::cout << "file location" << file << std::endl;
+        std::cout << "len of filename: " << filename_.size() << std::endl;
+        auto file = filename_.toStdString();
         auto lastslash = file.find_last_of('/');
-        std::cout << "last slash found on pos: " << lastslash << std::endl;
         if (file.find_last_of('/') != std::string::npos)
         {
             auto shorterFilename = file.substr(lastslash+1);
             return QString::fromStdString(shorterFilename);
         }
-        return filename;
+        return filename_;
     }
+
+    const std::vector<Line>& lines() const
+    {
+        return data_;
+    }
+
+    const QString filename() const
+    {
+        return filename_;
+    }
+private:
+    QString filename_;
+    std::vector<Line> data_;
 };
 
 class FileView
@@ -40,12 +77,13 @@ public:
     FileView(const FileContents& fileContents) : fileContents{fileContents}
     {
         std::cout << "c-tor of FileView" << std::endl;
-        for(auto it = std::begin(fileContents.data); it != std::end(fileContents.data); it = std::next(it))
+        for(auto it = fileContents.lines().cbegin(); it != fileContents.lines().cend(); it = std::next(it))
         {
             visibleLines.emplace_back(it);
         }
     }
 
+    // TODO: regex support
     void filter(const QString& substring, bool matchCase)
     {
         std::vector<typename std::vector<Line>::const_iterator> newVisibleLines;
@@ -87,14 +125,12 @@ public:
         return visibleLines.empty();
     }
 
-    int getNumOfLines() const
+    int size() const
     {
         return visibleLines.size();
     }
 
-
 private:
-
     const FileContents& fileContents;
     std::vector<typename std::vector<Line>::const_iterator> visibleLines;
 };

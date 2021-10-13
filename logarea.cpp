@@ -17,7 +17,7 @@
 #include <mytab.h>
 #include <timer.h>
 
-LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(parent), parent{parent}, fileView{fileView}, highlighter(nullptr)
+LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(parent), parent{parent}, fileView{fileView}
 {
     MEASURE_FUNCTION();
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -63,14 +63,14 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(paren
     }
 
     QString buf;
-    for (auto i = 0; i < fileView.getNumOfLines(); i++)
+    for (auto i = 0; i < fileView.size(); i++)
     {
         buf.append(fileView[i]->lineText);
     }
     appendPlainText(std::move(buf));
     buf.clear();
 
-    auto numOfBlocks = fileView.getNumOfLines() / 100 + 1;
+    auto numOfBlocks = fileView.size() / 100 + 1;
     highlightedBlocks = std::vector<int>(numOfBlocks, 0);
 
     isHiglightingConnected = false;
@@ -81,7 +81,7 @@ void LogArea::calculateLineNumberAreaWidth()
     int digits = 1;
     if (!fileView.empty())
     {
-        QString lastEntry = QString::number(fileView.getNumOfLines()) + "(" + QString::number(fileView.back()->lineNum) + ")";
+        QString lastEntry = QString::number(fileView.size()) + "(" + QString::number(fileView.back()->lineNum) + ")";
         digits = lastEntry.size();
     }
     auto font = Config::getFixedFont();
@@ -187,8 +187,10 @@ void LogArea::lineNumberAreaPaintEvent(QPaintEvent *event)
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
 
-    while (block.isValid() && top <= event->rect().bottom()) {
-        if (block.isVisible() && bottom >= event->rect().top()) {
+    while (block.isValid() && top <= event->rect().bottom())
+    {
+        if (block.isVisible() && bottom >= event->rect().top())
+        {
             QString number = "";
             if (blockNumber <lineNumbers.size())
                 number = lineNumbers[blockNumber];
@@ -248,7 +250,7 @@ void LogArea::highlightWords()
 
     isHiglightingConnected = true;
 
-    auto numOfBlocks = fileView.getNumOfLines() / 100 + 1;
+    auto numOfBlocks = fileView.size() / 100 + 1;
     highlightedBlocks = std::vector<int>(numOfBlocks, 0);
 
     fastHighlight();
@@ -271,8 +273,7 @@ void LogArea::mousePressEvent(QMouseEvent *event)
     QPlainTextEdit::mousePressEvent(event);
     if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier)
     {
-        std::cout << "ctrl + left click" << std::endl;
-        if (getCurrentLineNumber() < fileView.getNumOfLines())
+        if (getCurrentLineNumber() < fileView.size())
         {
             auto realnum = fileView[getCurrentLineNumber()]->lineNum;
             std::cout << "line number " << realnum << " clicked" << std::endl;

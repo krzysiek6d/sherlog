@@ -6,11 +6,11 @@
 #include <tabcontainer.h>
 #include <config.h>
 #include <QShortcut>
-#include <tabwithfilename.h>
+#include <documenttab.h>
 #include <QMessageBox>
 #include <QScrollBar>
 
-MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, MyTab* filterSource) :
+MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, const FileView& fileContents, MyTab* filterSource) :
     QWidget(parent),
     parent(parent),
     fileContents_{fileContents},
@@ -135,10 +135,11 @@ void MyTab::search(FindBackward findPrev)
 void MyTab::on_grepInput_returnPressed()
 {
     const auto& textToSearch = ui->grepInput->text();
+    const auto& newTabName = textToSearch;
     FileView view = fileContents_;
     auto matchCase = this->ui->grepMatchCase->isChecked();
     view.filter(textToSearch, matchCase);
-    parent->addTab(view, {}, textToSearch, this);
+    parent->addTab(view, newTabName, this);
 }
 
 void MyTab::on_gotoLineInput_returnPressed()
@@ -156,7 +157,7 @@ void MyTab::bookmark()
 {
     std::cout << "bookmarking line: " << editor->getCurrentLineNumber() << std::endl;
     FileView view = fileContents_;
-    if (editor->getCurrentLineNumber() < view.getNumOfLines())
+    if (editor->getCurrentLineNumber() < view.size())
     {
         auto realnum = view[editor->getCurrentLineNumber()]->lineNum;
         std::cout << "real line number: " << realnum << std::endl;

@@ -1,13 +1,11 @@
-#ifndef TABWITHFILENAME_H
-#define TABWITHFILENAME_H
-
+#pragma once
 #include <QWidget>
 #include <filecontents.h>
 #include <memory>
 #include <QListWidgetItem>
 
 namespace Ui {
-class tabWithFilename;
+class documentTab;
 }
 class MyTab;
 
@@ -17,13 +15,13 @@ struct Bookmark
     QString text;
 };
 
-class TabWithFilename : public QWidget
+class DocumentTab : public QWidget
 {
     Q_OBJECT
 
 public:
-    TabWithFilename(QWidget *parent, const FileContents& fileContents);
-    ~TabWithFilename();
+    DocumentTab(QWidget *parent, const FileContents& fileContents);
+    ~DocumentTab();
 
     void addBookmark(int num, const QString& text);
     void deleteBookmark(int index);
@@ -31,9 +29,8 @@ public:
 
 private:
     std::vector<Bookmark> bookmarks;
-    std::unique_ptr<Ui::tabWithFilename> ui;
+    std::unique_ptr<Ui::documentTab> ui;
     FileView fileView;
     MyTab* currentTab;
 };
 
-#endif // TABWITHFILENAME_H

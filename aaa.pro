@@ -28,26 +28,25 @@ SOURCES += \
         mainwindow.cpp \
     logarea.cpp \
     mytab.cpp \
-    tabwithfilename.cpp \
     tabcontainer.cpp \
-    config.cpp
+    config.cpp \
+    documenttab.cpp
 
 HEADERS += \
         mainwindow.h \
     logarea.h \
     filecontents.h \
-    tabwithfilename.h \
     tabcontainer.h \
     config.h \
-    myhighlighter.h \
     mytab.h \
-    timer.h
+    timer.h \
+    documenttab.h
 
 FORMS += \
         mainwindow.ui \
     mytab.ui \
-    tabwithfilename.ui \
-    tabcontainer.ui
+    tabcontainer.ui \
+    documenttab.ui
 
 CONFIG += static
 CONFIG += c++2a

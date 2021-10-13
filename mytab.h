@@ -11,7 +11,7 @@ class MyTab;
 }
 
 class TabContainer;
-class TabWithFilename;
+class DocumentTab;
 
 class MyTab : public QWidget
 {
@@ -19,7 +19,7 @@ class MyTab : public QWidget
     Q_OBJECT
 
 public:
-    MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, MyTab* filterSource);
+    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, const FileView& fileContents, MyTab* filterSource);
     ~MyTab();
 
     void showEvent( QShowEvent* event );
@@ -41,7 +41,7 @@ private:
     TabContainer *parent;
     FileView fileContents_;
     LogArea* editor;
-    TabWithFilename* tabWithFilename;
+    DocumentTab* tabWithFilename;
     Ui::MyTab *ui;
     MyTab* filterSource_;
 };

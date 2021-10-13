@@ -1,14 +1,13 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <memory>
-#include <logarea.h>
 #include <filecontents.h>
 
 namespace Ui {
 class MainWindow;
 }
+
 
 class MainWindow : public QMainWindow
 {
@@ -26,7 +25,4 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::vector<FileContents> filesContents;
-    std::unique_ptr<LogArea> logArea;
 };
-
-#endif // MAINWINDOW_H

@@ -1,4 +1,4 @@
-#include "tabwithfilename.h"
+#include "documenttab.h"
 #include "ui_tabwithfilename.h"
 #include "tabcontainer.h"
 #include <mytab.h>
@@ -7,14 +7,14 @@
 #include <QShortcut>
 
 
-TabWithFilename::TabWithFilename(QWidget *parent, const FileContents& fileContents) :
+DocumentTab::DocumentTab(QWidget *parent, const FileContents& fileContents) :
     QWidget(parent),
-    ui(new Ui::tabWithFilename),
+    ui(new Ui::documentTab),
     fileView(fileContents),
     currentTab(nullptr)
 {
     ui->setupUi(this);
-    ui->lineEdit->setText(fileContents.filename);
+    ui->lineEdit->setText(fileContents.filename());
     auto container = new TabContainer(this, this, fileView, nullptr);
     ui->horizontalLayout->addWidget(container);
 
@@ -31,13 +31,13 @@ TabWithFilename::TabWithFilename(QWidget *parent, const FileContents& fileConten
     });
 }
 
-TabWithFilename::~TabWithFilename()
+DocumentTab::~DocumentTab()
 {
     ui->bookmarksList->clear();
     std::cout << __func__ << std::endl;
 }
 
-void TabWithFilename::addBookmark(int num, const QString& text)
+void DocumentTab::addBookmark(int num, const QString& text)
 {
     std::cout << "num of bookmarks is: " << bookmarks.size() << std::endl;
 
@@ -57,7 +57,7 @@ void TabWithFilename::addBookmark(int num, const QString& text)
 }
 
 
-void TabWithFilename::deleteBookmark(int index)
+void DocumentTab::deleteBookmark(int index)
 {
     std::cout << "delete bookmark" << std::endl;
     ui->bookmarksList->clear();
@@ -69,7 +69,7 @@ void TabWithFilename::deleteBookmark(int index)
     }
 }
 
-void TabWithFilename::setCurrentTab(MyTab* tab)
+void DocumentTab::setCurrentTab(MyTab* tab)
 {
     currentTab = tab;
 }
