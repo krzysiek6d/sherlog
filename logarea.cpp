@@ -38,10 +38,6 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(paren
 
     shortcutFind.reset(new QShortcut(Config::markShorcut(), this)); // rememver to delete
     QObject::connect(shortcutFind.get(), &QShortcut::activated, [this](){this->highlightWords();});
-    QShortcut *shortcutDelete = new QShortcut(QKeySequence(Qt::Key_Delete), this);
-    QObject::connect(shortcutDelete, &QShortcut::activated, [](){/*prevent crash*/});
-
-
 
     lineNumberArea = new LineNumberArea(this);
     lineNumberArea->setFont(Config::getFixedFont());

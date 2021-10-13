@@ -59,7 +59,9 @@ void DocumentTab::addBookmark(int num, const QString& text)
 
 void DocumentTab::deleteBookmark(int index)
 {
-    std::cout << "delete bookmark" << std::endl;
+    if (index < 0)
+        return;
+    std::cout << "delete bookmark at" << index << std::endl;
     ui->bookmarksList->clear();
     bookmarks.erase(bookmarks.begin() + index);
     for (const auto& bookmark: bookmarks)
