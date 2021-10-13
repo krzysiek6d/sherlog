@@ -39,10 +39,9 @@ HEADERS += \
     tabwithfilename.h \
     tabcontainer.h \
     config.h \
-    timer.h \
     myhighlighter.h \
     mytab.h \
-    mytab.h
+    timer.h
 
 FORMS += \
         mainwindow.ui \
@@ -52,3 +51,4 @@ FORMS += \
 
 CONFIG += static
 CONFIG += c++2a
+QMAKE_LFLAGS += -static-libstdc++

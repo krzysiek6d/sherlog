@@ -4,7 +4,6 @@
 #include <QTextBlock>
 #include <config.h>
 #include <filecontents.h>
-#include "timer.h"
 #include <QShortcut>
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
@@ -16,8 +15,9 @@
 #include <QTimer>
 #include <QScrollBar>
 #include <mytab.h>
+#include <timer.h>
 
-CodeEditor::CodeEditor(MyTab *parent, const FileView& fileView) : QPlainTextEdit(parent), parent{parent}, fileView{fileView}, highlighter(nullptr)
+LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(parent), parent{parent}, fileView{fileView}, highlighter(nullptr)
 {
     MEASURE_FUNCTION();
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -36,8 +36,8 @@ CodeEditor::CodeEditor(MyTab *parent, const FileView& fileView) : QPlainTextEdit
     availableColors.insert(std::make_pair(Qt::GlobalColor::darkYellow, true));
 
 
-    QShortcut *shortcutFind = new QShortcut(Config::markShorcut(), this); // rememver to delete
-    QObject::connect(shortcutFind, &QShortcut::activated, [this](){this->highlightWords();});
+    shortcutFind.reset(new QShortcut(Config::markShorcut(), this)); // rememver to delete
+    QObject::connect(shortcutFind.get(), &QShortcut::activated, [this](){this->highlightWords();});
     QShortcut *shortcutDelete = new QShortcut(QKeySequence(Qt::Key_Delete), this);
     QObject::connect(shortcutDelete, &QShortcut::activated, [](){/*prevent crash*/});
 
@@ -46,9 +46,9 @@ CodeEditor::CodeEditor(MyTab *parent, const FileView& fileView) : QPlainTextEdit
     lineNumberArea = new LineNumberArea(this);
     lineNumberArea->setFont(Config::getFixedFont());
 
-    connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
-    connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
-    connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
+    connect(this, &LogArea::blockCountChanged, this, &LogArea::updateLineNumberAreaWidth);
+    connect(this, &LogArea::updateRequest, this, &LogArea::updateLineNumberArea);
+    connect(this, &LogArea::cursorPositionChanged, this, &LogArea::highlightCurrentLine);
 
 
 
@@ -76,7 +76,7 @@ CodeEditor::CodeEditor(MyTab *parent, const FileView& fileView) : QPlainTextEdit
     isHiglightingConnected = false;
 }
 
-void CodeEditor::calculateLineNumberAreaWidth()
+void LogArea::calculateLineNumberAreaWidth()
 {
     int digits = 1;
     if (!fileView.empty())
@@ -89,18 +89,18 @@ void CodeEditor::calculateLineNumberAreaWidth()
     lineNumberAreaWidth_ = space;
 }
 
-int CodeEditor::getLineNumberAreaWidth() const
+int LogArea::getLineNumberAreaWidth() const
 {
     return lineNumberAreaWidth_;
 }
 
-void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
+void LogArea::updateLineNumberAreaWidth(int /* newBlockCount */)
 {
     setViewportMargins(getLineNumberAreaWidth(), 0, 0, 0);
 }
 
 
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
+void LogArea::updateLineNumberArea(const QRect &rect, int dy)
 {
     if (dy)
         lineNumberArea->scroll(0, dy);
@@ -111,7 +111,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
         updateLineNumberAreaWidth(0);
 }
 
-void CodeEditor::resizeEvent(QResizeEvent *e)
+void LogArea::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
 
@@ -119,7 +119,7 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), getLineNumberAreaWidth(), cr.height()));
 }
 
-void CodeEditor::highlightCurrentLine()
+void LogArea::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
     QTextEdit::ExtraSelection selection;
@@ -134,7 +134,7 @@ void CodeEditor::highlightCurrentLine()
     setExtraSelections(extraSelections);
 }
 
-void CodeEditor::fastHighlight()
+void LogArea::fastHighlight()
 {
     auto blk = firstVisibleBlock();
     auto blkNum = blk.blockNumber();
@@ -143,11 +143,7 @@ void CodeEditor::fastHighlight()
 
     if (highlightedBlocks[blkNum / 100] == 0 )
     {
-//        std::cout << "rehighlighting between " << blkNum << " and " << blkNum + 200 << " is needed -> " << blk.blockNumber() << " - " << blk.blockNumber() + 200 << std::endl;
-
         highlightedBlocks[blkNum / 100] = 1;
-//        if (highLightingPatterns.empty())
-//            return;
 
         int i = 0;
         while (blk.isValid() && i < max) {
@@ -179,13 +175,9 @@ void CodeEditor::fastHighlight()
             blk = blk.next();
         }
     }
-//    else
-//    {
-//        std::cout << "rehighlighting between " << blkNum << " and " << blkNum + 200 << " is NOT needed" << std::endl;
-//    }
 }
 
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
+void LogArea::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), Qt::lightGray);
@@ -212,12 +204,12 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 }
 
-QString CodeEditor::getSelectedText()
+QString LogArea::getSelectedText()
 {
     return textCursor().selectedText();
 }
 
-void CodeEditor::highlightWords()
+void LogArea::highlightWords()
 {
     MEASURE_FUNCTION();
     auto selectedText = textCursor().selectedText().toLower();
@@ -254,15 +246,6 @@ void CodeEditor::highlightWords()
     }
     std::cout << "selected text: " << selectedText.toStdString() << std::endl;
 
-//    if (!highlighter)
-//        highlighter.reset(new MyHighlighter(document(), highLightingPatterns));
-//    else
-//    {
-//        highlighter->setPatterns(highLightingPatterns);
-//        highlighter->rehighlight();
-//    }
-
-
     isHiglightingConnected = true;
 
     auto numOfBlocks = fileView.getNumOfLines() / 100 + 1;
@@ -271,19 +254,19 @@ void CodeEditor::highlightWords()
     fastHighlight();
 }
 
-void CodeEditor::paintEvent( QPaintEvent* event ) {
+void LogArea::paintEvent( QPaintEvent* event ) {
     QPlainTextEdit::paintEvent( event );
     if (isHiglightingConnected)
         fastHighlight();
 }
 
-int CodeEditor::getCurrentLineNumber()
+int LogArea::getCurrentLineNumber()
 {
     QTextCursor cursor = textCursor();
     return cursor.blockNumber();
 }
 
-void CodeEditor::mousePressEvent(QMouseEvent *event)
+void LogArea::mousePressEvent(QMouseEvent *event)
 {
     QPlainTextEdit::mousePressEvent(event);
     if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier)

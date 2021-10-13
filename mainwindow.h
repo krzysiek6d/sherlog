@@ -26,7 +26,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::vector<FileContents> filesContents;
-    std::unique_ptr<CodeEditor> logArea;
+    std::unique_ptr<LogArea> logArea;
 };
 
 #endif // MAINWINDOW_H

@@ -15,7 +15,7 @@ TabWithFilename::TabWithFilename(QWidget *parent, const FileContents& fileConten
 {
     ui->setupUi(this);
     ui->lineEdit->setText(fileContents.filename);
-    auto container = new TabContainer(this, this, fileView, "Base", nullptr);
+    auto container = new TabContainer(this, this, fileView, nullptr);
     ui->horizontalLayout->addWidget(container);
 
     connect(ui->bookmarksList, &QListWidget::doubleClicked, [this](const QModelIndex &item){

@@ -5,7 +5,7 @@
 #include <tabwithfilename.h>
 
 
-TabContainer::TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, const QString& tabName, MyTab* filterSource) :
+TabContainer::TabContainer(QWidget *parent, TabWithFilename* tabWithFilename, const FileView& fileContents, MyTab* filterSource) :
     QWidget(parent),
     ui(new Ui::TabContainer),
     tabWithFilename{tabWithFilename}
@@ -30,7 +30,7 @@ TabContainer::~TabContainer()
 
 void TabContainer::addTab(const FileView& fileContents, const std::vector<int>& lines, const QString& tabName, MyTab* filterSource)
 {
-    ui->tabWidget->addTab(new TabContainer(this, tabWithFilename, fileContents, "Base", filterSource), tabName); // deletion is done by tabcloserequest
+    ui->tabWidget->addTab(new TabContainer(this, tabWithFilename, fileContents, filterSource), tabName); // deletion is done by tabcloserequest
 }
 
 void TabContainer::on_tabWidget_tabCloseRequested(int index)

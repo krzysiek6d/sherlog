@@ -40,7 +40,7 @@ private:
     void bookmark();
     TabContainer *parent;
     FileView fileContents_;
-    CodeEditor* editor;
+    LogArea* editor;
     TabWithFilename* tabWithFilename;
     Ui::MyTab *ui;
     MyTab* filterSource_;

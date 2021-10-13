@@ -49,7 +49,7 @@ MyTab::MyTab(TabContainer *parent, TabWithFilename* tabWithFilename, const FileV
     ui->findMatchCase->setFont(Config::getNormalFont());
     ui->gotoLineInput->setFont(Config::getNormalFont());
 
-    editor = new CodeEditor(this, fileContents_);
+    editor = new LogArea(this, fileContents_);
 
     ui->horizontalLayout->addWidget(editor);
 }

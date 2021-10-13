@@ -15,10 +15,10 @@ public:
     {
 
     }
-//    Timer(const& Timer) = delete;
-//    Timer(Timer&&) = delete;
-//    auto operator=(const Timer&) -> Timer& = delete;
-//    auto operator=(Timer&&) -> Timer& = delete;
+    Timer(const Timer&) = delete;
+    Timer(Timer&&) = delete;
+    auto operator=(const Timer&) -> Timer& = delete;
+    auto operator=(Timer&&) -> Timer& = delete;
     ~Timer()
     {
         using namespace std::chrono;
