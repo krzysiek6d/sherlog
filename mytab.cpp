@@ -42,11 +42,14 @@ MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, const FileView&
     ui->groupBox_2->setFont(Config::getNormalFont());
     ui->gotoLabel->setFont(Config::getNormalFont());
     ui->greplabel->setFont(Config::getNormalFont());
+    ui->grepRegex->setFont(Config::getNormalFont());
+    ui->grepReverse->setFont(Config::getNormalFont());
     ui->findLabel->setFont(Config::getNormalFont());
     ui->grepInput->setFont(Config::getNormalFont());
     ui->grepMatchCase->setFont(Config::getNormalFont());
     ui->findInput->setFont(Config::getNormalFont());
     ui->findMatchCase->setFont(Config::getNormalFont());
+    ui->findRegex->setFont(Config::getNormalFont());
     ui->gotoLineInput->setFont(Config::getNormalFont());
 
     editor = new LogArea(this, fileContents_);
@@ -100,8 +103,21 @@ void MyTab::search(FindBackward findPrev)
         options |= QTextDocument::FindBackward;
 
     Qt::CaseSensitivity cs = matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive;
-    QRegExp regex = QRegExp(text, cs);
-    if (not this->editor->find(regex, options))
+
+
+    auto smartFind = [this, cs, options](const QString& pattern){
+        if (this->ui->findRegex->isChecked())
+        {
+            QRegExp regex = QRegExp(pattern, cs);
+            return this->editor->find(regex, options);
+        }
+        else
+        {
+            return this->editor->find(pattern, options);
+        }
+    };
+
+    if (not smartFind(text))
     {
         QTextCursor cursorBackup(editor->textCursor());
         const int verticalScrollBarBackup = editor->verticalScrollBar()->value();
@@ -123,7 +139,7 @@ void MyTab::search(FindBackward findPrev)
             QTextCursor cursor(editor->document()->lastBlock());
             editor->setTextCursor(cursor);
         }
-        if (not this->editor->find(regex, options))
+        if (not smartFind(text))
         {
             editor->setTextCursor(cursorBackup);
             editor->verticalScrollBar()->setValue(verticalScrollBarBackup);

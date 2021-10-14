@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>796</width>
     <height>289</height>
    </rect>
   </property>
@@ -66,12 +66,52 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="grepInput"/>
+         <widget class="QLineEdit" name="grepInput">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>400</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="grepReverse">
+          <property name="text">
+           <string>reverse</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="grepMatchCase">
           <property name="text">
            <string>match case</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="grepRegex">
+          <property name="text">
+           <string>regex</string>
           </property>
          </widget>
         </item>
@@ -99,12 +139,45 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="findInput"/>
+         <widget class="QLineEdit" name="findInput">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>400</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QCheckBox" name="findMatchCase">
           <property name="text">
            <string>match case</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="findRegex">
+          <property name="text">
+           <string>regex</string>
           </property>
          </widget>
         </item>
@@ -134,7 +207,7 @@
         <item>
          <widget class="QLineEdit" name="gotoLineInput">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
