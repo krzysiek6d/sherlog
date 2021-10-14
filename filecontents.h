@@ -7,6 +7,7 @@
 #include <QFile>
 #include <iostream>
 #include <QTextStream>
+#include <QRegularExpression>
 
 struct Line
 {
@@ -84,16 +85,57 @@ public:
     }
 
     // TODO: regex support
-    void filter(const QString& substring, bool matchCase)
+    void filter(const QString& substring, bool matchCase, bool reverse, bool regex)
     {
         std::vector<typename std::vector<Line>::const_iterator> newVisibleLines;
         Qt::CaseSensitivity cs = matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive;
+
+
+        QRegularExpression::PatternOptions reOptions;
+        if (not matchCase)
+        {
+            reOptions |= QRegularExpression::CaseInsensitiveOption;
+        }
+        auto re = QRegularExpression(substring, reOptions);
+
         for(auto it : visibleLines)
         {
             const auto& line = it->lineText;
-            if (line.contains(substring, cs))
+            if (not reverse)
             {
-                newVisibleLines.emplace_back(it);
+                if (not regex)
+                {
+                    if (line.contains(substring, cs))
+                    {
+                        newVisibleLines.emplace_back(it);
+                    }
+                }
+                else
+                {
+                    // regex that matches
+                    if (re.match(line).hasMatch())
+                    {
+                        newVisibleLines.emplace_back(it);
+                    }
+                }
+            }
+            else
+            {
+                if (not regex)
+                {
+                    if (not line.contains(substring, cs))
+                    {
+                        newVisibleLines.emplace_back(it);
+                    }
+                }
+                else
+                {
+                    // regex that does not match
+                    if (not re.match(line).hasMatch())
+                    {
+                        newVisibleLines.emplace_back(it);
+                    }
+                }
             }
         }
         visibleLines = newVisibleLines;

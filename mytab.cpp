@@ -38,6 +38,14 @@ MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, const FileView&
     QShortcut *findPrev = new QShortcut(Config::findPrevShorcut(), this); // rememver to delete
     QObject::connect(findPrev, &QShortcut::activated, [this](){this->search(FindBackward(true));});
 
+    // Checkbox should focus the line they are reffering to
+    connect(ui->findMatchCase, &QCheckBox::clicked, [this](bool){this->focusFind();});
+    connect(ui->findRegex, &QCheckBox::clicked, [this](bool){this->focusFind();});
+    connect(ui->grepMatchCase, &QCheckBox::clicked, [this](bool){this->focusGrep();});
+    connect(ui->grepRegex, &QCheckBox::clicked, [this](bool){this->focusGrep();});
+    connect(ui->grepReverse, &QCheckBox::clicked, [this](bool){this->focusGrep();});
+
+
     setFont(Config::getNormalFont());
     ui->groupBox_2->setFont(Config::getNormalFont());
     ui->gotoLabel->setFont(Config::getNormalFont());
@@ -154,8 +162,11 @@ void MyTab::on_grepInput_returnPressed()
     const auto& newTabName = textToSearch;
     FileView view = fileContents_;
     auto matchCase = this->ui->grepMatchCase->isChecked();
-    view.filter(textToSearch, matchCase);
-    parent->addTab(view, newTabName, this);
+    auto reverse = this->ui->grepReverse->isChecked();
+    auto regex = this->ui->grepRegex->isChecked();
+    QString optionsStr = QString(" [") + (matchCase ? "C" : "c") + (reverse ? "R" : "r") + (regex ? "X" : "x") + "]";
+    view.filter(textToSearch, matchCase, reverse, regex);
+    parent->addTab(view, newTabName + optionsStr, this);
 }
 
 void MyTab::on_gotoLineInput_returnPressed()
