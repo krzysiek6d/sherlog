@@ -164,7 +164,7 @@ void MyTab::on_grepInput_returnPressed()
     auto matchCase = this->ui->grepMatchCase->isChecked();
     auto reverse = this->ui->grepReverse->isChecked();
     auto regex = this->ui->grepRegex->isChecked();
-    QString optionsStr = QString(" [") + (matchCase ? "C" : "c") + (reverse ? "R" : "r") + (regex ? "X" : "x") + "]";
+    QString optionsStr = QString(" [") + (matchCase ? "C" : "c") + (regex ? "X" : "x") + (reverse ? "R" : "r") + "]";
     view.filter(textToSearch, matchCase, reverse, regex);
     parent->addTab(view, newTabName + optionsStr, this);
 }
