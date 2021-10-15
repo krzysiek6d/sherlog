@@ -84,61 +84,13 @@ public:
         }
     }
 
-    // TODO: regex support
+
     void filter(const QString& substring, bool matchCase, bool reverse, bool regex)
     {
-        std::vector<typename std::vector<Line>::const_iterator> newVisibleLines;
-        Qt::CaseSensitivity cs = matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive;
-
-
-        QRegularExpression::PatternOptions reOptions;
-        if (not matchCase)
-        {
-            reOptions |= QRegularExpression::CaseInsensitiveOption;
-        }
-        auto re = QRegularExpression(substring, reOptions);
-
-        for(auto it : visibleLines)
-        {
-            const auto& line = it->lineText;
-            if (not reverse)
-            {
-                if (not regex)
-                {
-                    if (line.contains(substring, cs))
-                    {
-                        newVisibleLines.emplace_back(it);
-                    }
-                }
-                else
-                {
-                    // regex that matches
-                    if (re.match(line).hasMatch())
-                    {
-                        newVisibleLines.emplace_back(it);
-                    }
-                }
-            }
-            else
-            {
-                if (not regex)
-                {
-                    if (not line.contains(substring, cs))
-                    {
-                        newVisibleLines.emplace_back(it);
-                    }
-                }
-                else
-                {
-                    // regex that does not match
-                    if (not re.match(line).hasMatch())
-                    {
-                        newVisibleLines.emplace_back(it);
-                    }
-                }
-            }
-        }
-        visibleLines = newVisibleLines;
+        if (regex)
+            return filterRegex(substring, reverse, matchCase);
+        else
+            return filterPlainText(substring, reverse, matchCase);
     }
 
     auto begin() const
@@ -173,6 +125,42 @@ public:
     }
 
 private:
+    void filterPlainText(const QString& pattern, bool reverse, bool matchCase)
+    {
+        std::vector<typename std::vector<Line>::const_iterator> newVisibleLines;
+
+        Qt::CaseSensitivity cs = matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive;
+
+        for(auto it : visibleLines)
+        {
+            const auto& line = it->lineText;
+            if (reverse xor line.contains(pattern, cs))
+            {
+                newVisibleLines.emplace_back(it);
+            }
+        }
+        visibleLines = newVisibleLines;
+    }
+
+    void filterRegex(const QString& pattern, bool reverse, bool matchCase)
+    {
+        std::vector<typename std::vector<Line>::const_iterator> newVisibleLines;
+
+        QRegularExpression::PatternOptions reOptions;
+        if (not matchCase)
+            reOptions |= QRegularExpression::CaseInsensitiveOption;
+        auto re = QRegularExpression(pattern, reOptions);
+
+        for(auto it : visibleLines)
+        {
+            const auto& line = it->lineText;
+            if (reverse xor re.match(line).hasMatch())
+            {
+                newVisibleLines.emplace_back(it);
+            }
+        }
+        visibleLines = newVisibleLines;
+    }
     const FileContents& fileContents;
     std::vector<typename std::vector<Line>::const_iterator> visibleLines;
 };
