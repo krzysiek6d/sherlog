@@ -1,5 +1,5 @@
 #include "documenttab.h"
-#include "ui_tabwithfilename.h"
+#include "ui_documenttab.h"
 #include "tabcontainer.h"
 #include <mytab.h>
 #include <config.h>
@@ -16,7 +16,8 @@ DocumentTab::DocumentTab(QWidget *parent, const FileContents& fileContents) :
     ui->setupUi(this);
     ui->lineEdit->setText(fileContents.filename());
     auto container = new TabContainer(this, this, fileView, nullptr);
-    ui->horizontalLayout->addWidget(container);
+    ui->splitter->addWidget(container);
+    ui->splitter->setSizes(QList<int>() << 1 << 1); // dont know how it works but it sets size properly ;D
 
     connect(ui->bookmarksList, &QListWidget::doubleClicked, [this](const QModelIndex &item){
         std::cout << "item " << item.row() << " clicked!" << std::endl;

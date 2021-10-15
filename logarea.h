@@ -23,6 +23,7 @@ class LogArea : public QPlainTextEdit
 
 public:
     LogArea(MyTab *parent, const FileView& fileView);
+    ~LogArea();
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int getLineNumberAreaWidth() const;
@@ -45,9 +46,10 @@ private:
     void mousePressEvent(QMouseEvent *event);
 
     MyTab *parent;
-    QWidget *lineNumberArea;
-
     const FileView& fileView;
+    std::unique_ptr<QShortcut> shortcutMark;
+    std::unique_ptr<QWidget> lineNumberArea;
+
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;
 
@@ -55,8 +57,6 @@ private:
     std::vector<std::pair<QString, Qt::GlobalColor>> highLightingPatterns;
     std::vector<int> highlightedBlocks;
     bool isHiglightingConnected;
-
-    std::unique_ptr<QShortcut> shortcutFind;
 };
 
 

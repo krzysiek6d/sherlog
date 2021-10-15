@@ -17,7 +17,12 @@
 #include <mytab.h>
 #include <timer.h>
 
-LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(parent), parent{parent}, fileView{fileView}
+LogArea::LogArea(MyTab *parent, const FileView& fileView) :
+    QPlainTextEdit(parent),
+    parent{parent},
+    fileView{fileView},
+    shortcutMark{std::make_unique<QShortcut>(Config::markShorcut(), this)},
+    lineNumberArea{std::make_unique<LineNumberArea>(this)}
 {
     MEASURE_FUNCTION();
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -26,6 +31,7 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(paren
     setObjectName(QStringLiteral("textBrowser"));
     setFont(Config::getFixedFont());
     calculateLineNumberAreaWidth();
+    lineNumberArea->setFont(Config::getFixedFont());
 
     availableColors.insert(std::make_pair(Qt::GlobalColor::lightGray, true));
     availableColors.insert(std::make_pair(Qt::GlobalColor::green, true));
@@ -35,18 +41,10 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(paren
     availableColors.insert(std::make_pair(Qt::GlobalColor::yellow, true));
     availableColors.insert(std::make_pair(Qt::GlobalColor::darkYellow, true));
 
-
-    shortcutFind.reset(new QShortcut(Config::markShorcut(), this)); // rememver to delete
-    QObject::connect(shortcutFind.get(), &QShortcut::activated, [this](){this->highlightWords();});
-
-    lineNumberArea = new LineNumberArea(this);
-    lineNumberArea->setFont(Config::getFixedFont());
-
+    connect(shortcutMark.get(), &QShortcut::activated, [this](){this->highlightWords();});
     connect(this, &LogArea::blockCountChanged, this, &LogArea::updateLineNumberAreaWidth);
     connect(this, &LogArea::updateRequest, this, &LogArea::updateLineNumberArea);
     connect(this, &LogArea::cursorPositionChanged, this, &LogArea::highlightCurrentLine);
-
-
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
@@ -68,8 +66,11 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) : QPlainTextEdit(paren
 
     auto numOfBlocks = fileView.size() / 100 + 1;
     highlightedBlocks = std::vector<int>(numOfBlocks, 0);
-
     isHiglightingConnected = false;
+}
+
+LogArea::~LogArea()
+{
 }
 
 void LogArea::calculateLineNumberAreaWidth()
@@ -175,7 +176,7 @@ void LogArea::fastHighlight()
 
 void LogArea::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
-    QPainter painter(lineNumberArea);
+    QPainter painter(lineNumberArea.get());
     painter.fillRect(event->rect(), Qt::lightGray);
 
     QTextBlock block = firstVisibleBlock();

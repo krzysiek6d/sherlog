@@ -24,8 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
+    main.cpp \
+    mainwindow.cpp \
     logarea.cpp \
     mytab.cpp \
     tabcontainer.cpp \
@@ -33,7 +33,7 @@ SOURCES += \
     documenttab.cpp
 
 HEADERS += \
-        mainwindow.h \
+    mainwindow.h \
     logarea.h \
     filecontents.h \
     tabcontainer.h \
@@ -43,11 +43,13 @@ HEADERS += \
     documenttab.h
 
 FORMS += \
-        mainwindow.ui \
+    mainwindow.ui \
     mytab.ui \
     tabcontainer.ui \
     documenttab.ui
 
 CONFIG += static
-CONFIG += c++2a
+#CONFIG += sanitizer sanitize_address
+
+QMAKE_CXXFLAGS += -std=c++2a
 QMAKE_LFLAGS += -static-libstdc++

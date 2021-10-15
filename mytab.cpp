@@ -207,7 +207,7 @@ void MyTab::showLineInFilterSource(int realnum)
 {
     if (filterSource_)
     {
-        filterSource_->parent->setActiveTab(filterSource_);
+        filterSource_->parent->switchTab(filterSource_);
         filterSource_->gotoLineInFile(realnum);
     }
 }
