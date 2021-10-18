@@ -36,6 +36,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *e) override;
 
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);

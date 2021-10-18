@@ -132,6 +132,19 @@ void LogArea::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), getLineNumberAreaWidth(), cr.height()));
 }
 
+void LogArea::wheelEvent(QWheelEvent *e)
+{
+    if ((e->modifiers() == Qt::ControlModifier) && (e->delta() > 0))
+    {
+       zoomIn();
+    }
+    else if ((e->modifiers() == Qt::ControlModifier) && (e->delta() < 0))
+    {
+       zoomOut();
+    }
+    QPlainTextEdit::wheelEvent(e);
+}
+
 void LogArea::highlightCurrentLine()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
