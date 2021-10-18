@@ -27,8 +27,12 @@ public:
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     int getLineNumberAreaWidth() const;
+    int getCurrentBlockNumber();
     int getCurrentLineNumber();
     QString getSelectedText();
+    void gotoBlockNum(int blockNum);
+    void gotoLine(int lineNum);
+    void search(const QString& text, bool backward, bool matchCase, bool regex);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

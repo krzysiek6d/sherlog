@@ -10,10 +10,11 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, const FileView& fileContents, MyTab* filterSource) :
+MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileContents, MyTab* filterSource) :
     QWidget(parent),
     parent(parent),
-    fileContents_{fileContents},
+    fileContents_{std::move(fileContents)},
+    editor(new LogArea(this, fileContents_)),
     tabWithFilename{tabWithFilename},
     ui(new Ui::MyTab),
     filterSource_{filterSource}
@@ -60,8 +61,6 @@ MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, const FileView&
     ui->findRegex->setFont(Config::getNormalFont());
     ui->gotoLineInput->setFont(Config::getNormalFont());
 
-    editor = new LogArea(this, fileContents_);
-
     ui->horizontalLayout->addWidget(editor);
 }
 
@@ -100,107 +99,46 @@ void MyTab::focusFind()
 
 void MyTab::search(FindBackward findPrev)
 {
-    QTextCursor cursor = this->editor->textCursor();
     QString text = this->ui->findInput->text();
-
     auto matchCase = this->ui->findMatchCase->isChecked();
-    QTextDocument::FindFlags options;
-    if (matchCase)
-        options |= QTextDocument::FindCaseSensitively;
-    if (findPrev)
-        options |= QTextDocument::FindBackward;
-
-    Qt::CaseSensitivity cs = matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive;
-
-
-    auto smartFind = [this, cs, options](const QString& pattern){
-        if (this->ui->findRegex->isChecked())
-        {
-            QRegExp regex = QRegExp(pattern, cs);
-            return this->editor->find(regex, options);
-        }
-        else
-        {
-            return this->editor->find(pattern, options);
-        }
-    };
-
-    if (not smartFind(text))
-    {
-        QTextCursor cursorBackup(editor->textCursor());
-        const int verticalScrollBarBackup = editor->verticalScrollBar()->value();
-        const int horizontalScrollBarBackup = editor->horizontalScrollBar()->value();
-
-        QMessageBox* loopMsgBox = new QMessageBox(QMessageBox::Information,
-                                                  QString("Search"),
-                                                  QString("No more results found, looping the file"),
-                                                  QMessageBox::Ok,
-                                                  this);
-        loopMsgBox->show();
-        if (!findPrev)
-        {
-            QTextCursor cursor(editor->document()->firstBlock());
-            editor->setTextCursor(cursor);
-        }
-        else
-        {
-            QTextCursor cursor(editor->document()->lastBlock());
-            editor->setTextCursor(cursor);
-        }
-        if (not smartFind(text))
-        {
-            editor->setTextCursor(cursorBackup);
-            editor->verticalScrollBar()->setValue(verticalScrollBarBackup);
-            editor->horizontalScrollBar()->setValue(horizontalScrollBarBackup);
-        }
-    }
+    auto backward = findPrev;
+    auto regex = this->ui->findRegex->isChecked();
+    editor->search(text, backward, matchCase, regex);
 }
 
 void MyTab::on_grepInput_returnPressed()
 {
     const auto& textToSearch = ui->grepInput->text();
     const auto& newTabName = textToSearch;
-    FileView view = fileContents_;
+
+    //TODO: create prepareFilterOptionsInfoStr...
     auto matchCase = this->ui->grepMatchCase->isChecked();
     auto reverse = this->ui->grepReverse->isChecked();
     auto regex = this->ui->grepRegex->isChecked();
     QString optionsStr = QString(" [") + (matchCase ? "C" : "c") + (regex ? "X" : "x") + (reverse ? "R" : "r") + "]";
+
+    FileView view = fileContents_;
     view.filter(textToSearch, matchCase, reverse, regex);
+
     parent->addTab(view, newTabName + optionsStr, this);
 }
 
 void MyTab::on_gotoLineInput_returnPressed()
 {
-    std::cout << "going to line (text): " << ui->gotoLineInput->text().toStdString() << std::endl;
     int ln = ui->gotoLineInput->text().toUInt();
     if (ln == 0 && ui->gotoLineInput->text() != "0")
         return;
-    std::cout << "going to line: " << ln << std::endl;
-    QTextCursor cursor(editor->document()->findBlockByLineNumber(ln-1)); // ln-1 because line number starts from 0
-    editor->setTextCursor(cursor);
+    editor->gotoBlockNum(ln-1);
 }
 
 void MyTab::bookmark()
 {
-    std::cout << "bookmarking line: " << editor->getCurrentLineNumber() << std::endl;
-    FileView view = fileContents_;
-    if (editor->getCurrentLineNumber() < view.size())
-    {
-        auto realnum = view[editor->getCurrentLineNumber()]->lineNum;
-        std::cout << "real line number: " << realnum << std::endl;
-        tabWithFilename->addBookmark(realnum, editor->getSelectedText());
-    }
+    tabWithFilename->addBookmark(editor->getCurrentLineNumber(), editor->getSelectedText());
 }
 
 void MyTab::gotoLineInFile(int lineNum)
 {
-    FileView view = fileContents_;
-    auto lineIt = std::lower_bound(view.begin(), view.end(), lineNum,
-                                   [](const auto& elem, const auto& elem2){return elem->lineNum < elem2;});
-    auto localLineNum = std::distance(view.begin(), lineIt);
-    std::cout << "want to go to line number in file : " << lineNum << ", this means: goto line in view: " << localLineNum << std::endl;
-    QTextCursor cursor(editor->document()->findBlockByLineNumber(localLineNum)); // ln-1 because line number starts from 0
-    editor->setTextCursor(cursor);
+    editor->gotoLine(lineNum);
 }
 
 void MyTab::showLineInFilterSource(int realnum)

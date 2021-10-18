@@ -7,6 +7,7 @@
 #include <QShortcut>
 #include <QSyntaxHighlighter>
 #include <QRegularExpression>
+#include <QMessageBox>
 #include <algorithm>
 #include <ranges>
 #include <cassert>
@@ -71,6 +72,21 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) :
 
 LogArea::~LogArea()
 {
+    std::cout << "deleting LogArea" << std::endl;
+}
+
+void LogArea::gotoBlockNum(int blockNum)
+{
+    QTextCursor cursor(document()->findBlockByLineNumber(blockNum));
+    setTextCursor(cursor);
+}
+
+void LogArea::gotoLine(int lineNum)
+{
+    auto lineIt = std::lower_bound(fileView.begin(), fileView.end(), lineNum,
+                                   [](const auto& elem, const auto& elem2){return elem->lineNum < elem2;});
+    auto blockNum = std::distance(fileView.begin(), lineIt);
+    gotoBlockNum(blockNum);
 }
 
 void LogArea::calculateLineNumberAreaWidth()
@@ -259,10 +275,15 @@ void LogArea::paintEvent( QPaintEvent* event ) {
         fastHighlight();
 }
 
-int LogArea::getCurrentLineNumber()
+int LogArea::getCurrentBlockNumber()
 {
     QTextCursor cursor = textCursor();
     return cursor.blockNumber();
+}
+
+int LogArea::getCurrentLineNumber()
+{
+    return fileView[getCurrentBlockNumber()]->lineNum;
 }
 
 void LogArea::mousePressEvent(QMouseEvent *event)
@@ -270,12 +291,62 @@ void LogArea::mousePressEvent(QMouseEvent *event)
     QPlainTextEdit::mousePressEvent(event);
     if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier)
     {
-        if (getCurrentLineNumber() < fileView.size())
+        parent->showLineInFilterSource(getCurrentLineNumber());
+    }
+}
+
+
+void LogArea::search(const QString& text, bool backward, bool matchCase, bool regex)
+{
+    QTextCursor cursor = textCursor();
+    QTextDocument::FindFlags options;
+    if (matchCase)
+        options |= QTextDocument::FindCaseSensitively;
+    if (backward)
+        options |= QTextDocument::FindBackward;
+
+    Qt::CaseSensitivity cs = matchCase ? Qt::CaseSensitive : Qt::CaseInsensitive;
+
+
+    auto smartFind = [this, cs, options, regex](const QString& pattern){
+        if (regex)
         {
-            auto realnum = fileView[getCurrentLineNumber()]->lineNum;
-            std::cout << "line number " << realnum << " clicked" << std::endl;
-            parent->showLineInFilterSource(realnum);
+            QRegExp re = QRegExp(pattern, cs);
+            return find(re, options);
+        }
+        else
+        {
+            return find(pattern, options);
+        }
+    };
+
+    if (not smartFind(text))
+    {
+        QTextCursor cursorBackup(textCursor());
+        const int verticalScrollBarBackup = verticalScrollBar()->value();
+        const int horizontalScrollBarBackup = horizontalScrollBar()->value();
+
+        QMessageBox* loopMsgBox = new QMessageBox(QMessageBox::Information,
+                                                  QString("Search"),
+                                                  QString("No more results found, looping the file"),
+                                                  QMessageBox::Ok,
+                                                  this);
+        loopMsgBox->show();
+        if (!backward)
+        {
+            QTextCursor cursor(document()->firstBlock());
+            setTextCursor(cursor);
+        }
+        else
+        {
+            QTextCursor cursor(document()->lastBlock());
+            setTextCursor(cursor);
+        }
+        if (not smartFind(text))
+        {
+            setTextCursor(cursorBackup);
+            verticalScrollBar()->setValue(verticalScrollBarBackup);
+            horizontalScrollBar()->setValue(horizontalScrollBarBackup);
         }
     }
-
 }

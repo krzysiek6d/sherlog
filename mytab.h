@@ -19,7 +19,7 @@ class MyTab : public QWidget
     Q_OBJECT
 
 public:
-    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, const FileView& fileContents, MyTab* filterSource);
+    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileContents, MyTab* filterSource);
     ~MyTab();
 
     void showEvent( QShowEvent* event );
