@@ -13,6 +13,7 @@ public:
     static QFont getFixedFont();
     static QFont getNormalFont();
     static const std::vector<QColor>& getMarkingColors();
+    static QColor currentLineColor();
 
     static QKeySequence findShorcut();
     static QKeySequence findNextShorcut();

@@ -9,14 +9,24 @@ Config::Config()
 
 const std::vector<QColor>& Config::getMarkingColors()
 {
-    static std::vector<QColor> colors;
-    colors.push_back(QColor(154, 222, 235));
-    colors.push_back(QColor(203, 171, 199));
-    colors.push_back(QColor(237, 212, 0));
-    colors.push_back(QColor(210, 139, 139));
-    colors.push_back(QColor(139, 210, 168));
-
+    static std::vector<QColor> colors{
+        QColor(240, 232, 205),
+        QColor(192, 213, 185),
+        QColor(253, 202, 162),
+        QColor(255, 250, 129),
+        QColor(224, 243, 176),
+        QColor(111, 183, 214),
+        QColor(191, 213, 232),
+        QColor(117, 137, 191),
+        QColor(165, 137, 193),
+        QColor(253, 222, 238),
+        QColor(249, 140, 182)};
     return colors;
+}
+
+QColor Config::currentLineColor()
+{
+    return QColor(240, 240, 240);
 }
 
 QFont Config::getFixedFont()
