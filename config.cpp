@@ -7,6 +7,17 @@ Config::Config()
 
 }
 
+const std::vector<QColor>& Config::getMarkingColors()
+{
+    static std::vector<QColor> colors;
+    colors.push_back(QColor(154, 222, 235));
+    colors.push_back(QColor(203, 171, 199));
+    colors.push_back(QColor(237, 212, 0));
+    colors.push_back(QColor(210, 139, 139));
+    colors.push_back(QColor(139, 210, 168));
+
+    return colors;
+}
 
 QFont Config::getFixedFont()
 {

@@ -18,6 +18,19 @@
 #include <mytab.h>
 #include <timer.h>
 
+const int repaintBlockSize = 100;
+
+bool operator<(const QColor& l, const QColor& r)
+{
+    int lr, lg, lb, rr, rg, rb;
+    l.getRgb(&lr, &lg, &lb);
+    r.getRgb(&rr, &rg, &rb);
+    int lVal = lr << 16 | lg << 8 | lb;
+    int rVal = rr << 16 | rg << 8 | rb;
+    return lVal < rVal;
+}
+
+
 LogArea::LogArea(MyTab *parent, const FileView& fileView) :
     QPlainTextEdit(parent),
     parent{parent},
@@ -34,13 +47,8 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) :
     calculateLineNumberAreaWidth();
     lineNumberArea->setFont(Config::getFixedFont());
 
-    availableColors.insert(std::make_pair(Qt::GlobalColor::lightGray, true));
-    availableColors.insert(std::make_pair(Qt::GlobalColor::green, true));
-    availableColors.insert(std::make_pair(Qt::GlobalColor::blue, true));
-    availableColors.insert(std::make_pair(Qt::GlobalColor::cyan, true));
-    availableColors.insert(std::make_pair(Qt::GlobalColor::red, true));
-    availableColors.insert(std::make_pair(Qt::GlobalColor::yellow, true));
-    availableColors.insert(std::make_pair(Qt::GlobalColor::darkYellow, true));
+    for(const auto& color: Config::getMarkingColors())
+        availableColors.insert({color, true});
 
     connect(shortcutMark.get(), &QShortcut::activated, [this](){this->highlightWords();});
     connect(this, &LogArea::blockCountChanged, this, &LogArea::updateLineNumberAreaWidth);
@@ -63,9 +71,10 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) :
         buf.append(fileView[i]->lineText);
     }
     appendPlainText(std::move(buf));
-    buf.clear();
 
-    auto numOfBlocks = fileView.size() / 100 + 1;
+    gotoFirstBlock();
+
+    auto numOfBlocks = fileView.size() / repaintBlockSize + 1;
     highlightedBlocks = std::vector<int>(numOfBlocks, 0);
     isHiglightingConnected = false;
 }
@@ -87,6 +96,18 @@ void LogArea::gotoLine(int lineNum)
                                    [](const auto& elem, const auto& elem2){return elem->lineNum < elem2;});
     auto blockNum = std::distance(fileView.begin(), lineIt);
     gotoBlockNum(blockNum);
+}
+
+void LogArea::gotoFirstBlock()
+{
+    QTextCursor cursor(document()->firstBlock());
+    setTextCursor(cursor);
+}
+
+void LogArea::gotoLastBlock()
+{
+    QTextCursor cursor(document()->lastBlock());
+    setTextCursor(cursor);
 }
 
 void LogArea::calculateLineNumberAreaWidth()
@@ -164,12 +185,12 @@ void LogArea::fastHighlight()
 {
     auto blk = firstVisibleBlock();
     auto blkNum = blk.blockNumber();
-    blk = document()->findBlockByLineNumber(blkNum / 100 * 100);
-    auto max = 200;
+    blk = document()->findBlockByLineNumber(blkNum / repaintBlockSize * repaintBlockSize);
+    auto max = repaintBlockSize * 2;
 
-    if (highlightedBlocks[blkNum / 100] == 0 )
+    if (highlightedBlocks[blkNum / repaintBlockSize] == 0 )
     {
-        highlightedBlocks[blkNum / 100] = 1;
+        highlightedBlocks[blkNum / repaintBlockSize] = 1;
 
         int i = 0;
         while (blk.isValid() && i < max) {
@@ -309,9 +330,18 @@ void LogArea::mousePressEvent(QMouseEvent *event)
 }
 
 
+void LogArea::showFindNoResultsMessage()
+{
+    QMessageBox* loopMsgBox = new QMessageBox(QMessageBox::Information,
+                                              QString("Search"),
+                                              QString("No more results found, looping the file"),
+                                              QMessageBox::Ok,
+                                              this);
+    loopMsgBox->show();
+}
+
 void LogArea::search(const QString& text, bool backward, bool matchCase, bool regex)
 {
-    QTextCursor cursor = textCursor();
     QTextDocument::FindFlags options;
     if (matchCase)
         options |= QTextDocument::FindCaseSensitively;
@@ -335,31 +365,19 @@ void LogArea::search(const QString& text, bool backward, bool matchCase, bool re
 
     if (not smartFind(text))
     {
-        QTextCursor cursorBackup(textCursor());
-        const int verticalScrollBarBackup = verticalScrollBar()->value();
-        const int horizontalScrollBarBackup = horizontalScrollBar()->value();
+        auto restorePosition =
+                [this, cBak = textCursor(), vScrlBak = verticalScrollBar()->value(), hScrlBak = horizontalScrollBar()->value()]()
+        {
+            setTextCursor(cBak);
+            verticalScrollBar()->setValue(vScrlBak);
+            horizontalScrollBar()->setValue(hScrlBak);
+        };
 
-        QMessageBox* loopMsgBox = new QMessageBox(QMessageBox::Information,
-                                                  QString("Search"),
-                                                  QString("No more results found, looping the file"),
-                                                  QMessageBox::Ok,
-                                                  this);
-        loopMsgBox->show();
-        if (!backward)
-        {
-            QTextCursor cursor(document()->firstBlock());
-            setTextCursor(cursor);
-        }
-        else
-        {
-            QTextCursor cursor(document()->lastBlock());
-            setTextCursor(cursor);
-        }
+        showFindNoResultsMessage();
+        backward ? gotoLastBlock() : gotoFirstBlock();
         if (not smartFind(text))
         {
-            setTextCursor(cursorBackup);
-            verticalScrollBar()->setValue(verticalScrollBarBackup);
-            horizontalScrollBar()->setValue(horizontalScrollBarBackup);
+            restorePosition();
         }
     }
 }

@@ -17,6 +17,7 @@ class LineNumberArea;
 class MyTab;
 
 
+
 class LogArea : public QPlainTextEdit
 {
     Q_OBJECT
@@ -32,6 +33,8 @@ public:
     QString getSelectedText();
     void gotoBlockNum(int blockNum);
     void gotoLine(int lineNum);
+    void gotoFirstBlock();
+    void gotoLastBlock();
     void search(const QString& text, bool backward, bool matchCase, bool regex);
 
 protected:
@@ -58,10 +61,11 @@ private:
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;
 
-    std::map<Qt::GlobalColor, bool> availableColors;
-    std::vector<std::pair<QString, Qt::GlobalColor>> highLightingPatterns;
+    std::map<QColor, bool> availableColors;
+    std::vector<std::pair<QString, QColor>> highLightingPatterns;
     std::vector<int> highlightedBlocks;
     bool isHiglightingConnected;
+    void showFindNoResultsMessage();
 };
 
 
