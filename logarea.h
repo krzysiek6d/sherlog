@@ -4,6 +4,7 @@
 #include "filecontents.h"
 #include <memory>
 #include <QShortcut>
+#include "highlighter.h"
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -40,6 +41,8 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
     void wheelEvent(QWheelEvent *e) override;
+    void paintEvent(QPaintEvent* event);
+    void mousePressEvent(QMouseEvent *event);
 
 private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
@@ -49,23 +52,17 @@ private slots:
 private:
     void calculateLineNumberAreaWidth();
     void highlightWords();
-    void fastHighlight();
-    void paintEvent(QPaintEvent* event);
-    void mousePressEvent(QMouseEvent *event);
+    void showFindNoResultsMessage();
 
     MyTab *parent;
     const FileView& fileView;
     std::unique_ptr<QShortcut> shortcutMark;
     std::unique_ptr<QWidget> lineNumberArea;
+    std::unique_ptr<Highlighter> highlighter;
 
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;
 
-    std::map<QColor, bool> availableColors;
-    std::vector<std::pair<QString, QColor>> highLightingPatterns;
-    std::vector<int> highlightedBlocks;
-    bool isHiglightingConnected;
-    void showFindNoResultsMessage();
 };
 
 

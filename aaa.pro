@@ -30,7 +30,8 @@ SOURCES += \
     mytab.cpp \
     tabcontainer.cpp \
     config.cpp \
-    documenttab.cpp
+    documenttab.cpp \
+    highlighter.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -40,7 +41,8 @@ HEADERS += \
     config.h \
     mytab.h \
     timer.h \
-    documenttab.h
+    documenttab.h \
+    highlighter.h
 
 FORMS += \
     mainwindow.ui \

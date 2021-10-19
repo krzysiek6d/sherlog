@@ -133,7 +133,8 @@ void MyTab::on_gotoLineInput_returnPressed()
 
 void MyTab::bookmark()
 {
-    tabWithFilename->addBookmark(editor->getCurrentLineNumber(), editor->getSelectedText());
+    if (editor->getCurrentLineNumber() > 0)
+        tabWithFilename->addBookmark(editor->getCurrentLineNumber(), editor->getSelectedText());
 }
 
 void MyTab::gotoLineInFile(int lineNum)

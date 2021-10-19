@@ -18,25 +18,14 @@
 #include <mytab.h>
 #include <timer.h>
 
-const int repaintBlockSize = 100;
-
-bool operator<(const QColor& l, const QColor& r)
-{
-    int lr, lg, lb, rr, rg, rb;
-    l.getRgb(&lr, &lg, &lb);
-    r.getRgb(&rr, &rg, &rb);
-    int lVal = lr << 16 | lg << 8 | lb;
-    int rVal = rr << 16 | rg << 8 | rb;
-    return lVal < rVal;
-}
-
 
 LogArea::LogArea(MyTab *parent, const FileView& fileView) :
     QPlainTextEdit(parent),
     parent{parent},
     fileView{fileView},
     shortcutMark{std::make_unique<QShortcut>(Config::markShorcut(), this)},
-    lineNumberArea{std::make_unique<LineNumberArea>(this)}
+    lineNumberArea{std::make_unique<LineNumberArea>(this)},
+    highlighter{std::make_unique<Highlighter>(*document())}
 {
     MEASURE_FUNCTION();
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -47,16 +36,12 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) :
     calculateLineNumberAreaWidth();
     lineNumberArea->setFont(Config::getFixedFont());
 
-    for(const auto& color: Config::getMarkingColors())
-        availableColors.insert({color, true});
-
     connect(shortcutMark.get(), &QShortcut::activated, [this](){this->highlightWords();});
     connect(this, &LogArea::blockCountChanged, this, &LogArea::updateLineNumberAreaWidth);
     connect(this, &LogArea::updateRequest, this, &LogArea::updateLineNumberArea);
     connect(this, &LogArea::cursorPositionChanged, this, &LogArea::highlightCurrentLine);
 
     updateLineNumberAreaWidth(0);
-    highlightCurrentLine();
 
     auto num = 0;
     for (const auto& line: fileView)
@@ -71,12 +56,7 @@ LogArea::LogArea(MyTab *parent, const FileView& fileView) :
         buf.append(fileView[i]->lineText);
     }
     appendPlainText(std::move(buf));
-
     gotoFirstBlock();
-
-    auto numOfBlocks = fileView.size() / repaintBlockSize + 1;
-    highlightedBlocks = std::vector<int>(numOfBlocks, 0);
-    isHiglightingConnected = false;
 }
 
 LogArea::~LogArea()
@@ -155,16 +135,27 @@ void LogArea::resizeEvent(QResizeEvent *e)
 
 void LogArea::wheelEvent(QWheelEvent *e)
 {
-    if ((e->modifiers() == Qt::ControlModifier) && (e->delta() > 0))
+    if (e->modifiers() == Qt::ControlModifier && e->delta() > 0)
     {
        zoomIn();
     }
-    else if ((e->modifiers() == Qt::ControlModifier) && (e->delta() < 0))
+    else if (e->modifiers() == Qt::ControlModifier && e->delta() < 0)
     {
        zoomOut();
     }
     QPlainTextEdit::wheelEvent(e);
 }
+
+
+void LogArea::mousePressEvent(QMouseEvent *event)
+{
+    QPlainTextEdit::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier)
+    {
+        parent->showLineInFilterSource(getCurrentLineNumber());
+    }
+}
+
 
 void LogArea::highlightCurrentLine()
 {
@@ -178,49 +169,6 @@ void LogArea::highlightCurrentLine()
     extraSelections.append(selection);
 
     setExtraSelections(extraSelections);
-}
-
-void LogArea::fastHighlight()
-{
-    auto blk = firstVisibleBlock();
-    auto blkNum = blk.blockNumber();
-    blk = document()->findBlockByLineNumber(blkNum / repaintBlockSize * repaintBlockSize);
-    auto max = repaintBlockSize * 2;
-
-    if (highlightedBlocks[blkNum / repaintBlockSize] == 0 )
-    {
-        highlightedBlocks[blkNum / repaintBlockSize] = 1;
-
-        int i = 0;
-        while (blk.isValid() && i < max) {
-
-            auto text = blk.text();
-
-            QTextCharFormat clearFormat;
-            QTextCursor cursor(blk);
-            cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-            cursor.setCharFormat(clearFormat);
-            for (const auto& [pattern, color]: highLightingPatterns)
-            {
-                QTextCharFormat myClassFormat;
-                myClassFormat.setFontWeight(QFont::Bold);
-                myClassFormat.setBackground(color);
-
-                int j = 0;
-                while ((j = text.indexOf(pattern, j, Qt::CaseInsensitive)) != -1) {
-
-                    QTextCursor tempCursor(blk);
-                    tempCursor.setPosition(blk.begin().fragment().position() + j);
-                    tempCursor.setPosition(blk.begin().fragment().position() + j + pattern.length(), QTextCursor::KeepAnchor);
-                    tempCursor.setCharFormat(myClassFormat);
-                    ++j;
-                }
-
-            }
-            i++;
-            blk = blk.next();
-        }
-    }
 }
 
 void LogArea::lineNumberAreaPaintEvent(QPaintEvent *event)
@@ -259,53 +207,13 @@ QString LogArea::getSelectedText()
 
 void LogArea::highlightWords()
 {
-    MEASURE_FUNCTION();
-    auto selectedText = textCursor().selectedText().toLower();
-
-    auto it = std::find_if(highLightingPatterns.begin(), highLightingPatterns.end(),
-                           [&selectedText](auto & elem)
-    {
-        return selectedText == elem.first;
-    });
-    if (it != highLightingPatterns.end())
-    {
-        availableColors[it->second] = true;
-        highLightingPatterns.erase(it);
-    }
-    else
-    {
-        auto firstAvailableColorIt = std::find_if(availableColors.begin(), availableColors.end(),
-                                                [](const auto& elem){
-            return elem.second;
-        });
-        if (firstAvailableColorIt == availableColors.end())
-        {
-            assert(!highLightingPatterns.empty());
-            auto firstpattern = highLightingPatterns.begin();
-            availableColors[firstpattern->second] = true;
-            highLightingPatterns.erase(firstpattern);
-            firstAvailableColorIt = std::find_if(availableColors.begin(), availableColors.end(),
-                                                            [](const auto& elem){
-                        return elem.second;
-                    });
-        }
-        firstAvailableColorIt->second = false;
-        highLightingPatterns.push_back(std::make_pair(selectedText, firstAvailableColorIt->first));
-    }
-    std::cout << "selected text: " << selectedText.toStdString() << std::endl;
-
-    isHiglightingConnected = true;
-
-    auto numOfBlocks = fileView.size() / 100 + 1;
-    highlightedBlocks = std::vector<int>(numOfBlocks, 0);
-
-    fastHighlight();
+    highlighter->addToHighLights(textCursor().selectedText().toLower());
+    highlighter->highlight(firstVisibleBlock());
 }
 
 void LogArea::paintEvent( QPaintEvent* event ) {
     QPlainTextEdit::paintEvent( event );
-    if (isHiglightingConnected)
-        fastHighlight();
+    highlighter->highlight(firstVisibleBlock());
 }
 
 int LogArea::getCurrentBlockNumber()
@@ -316,18 +224,10 @@ int LogArea::getCurrentBlockNumber()
 
 int LogArea::getCurrentLineNumber()
 {
+    if (fileView.empty())
+        return -1;
     return fileView[getCurrentBlockNumber()]->lineNum;
 }
-
-void LogArea::mousePressEvent(QMouseEvent *event)
-{
-    QPlainTextEdit::mousePressEvent(event);
-    if (event->button() == Qt::LeftButton && event->modifiers() == Qt::ControlModifier)
-    {
-        parent->showLineInFilterSource(getCurrentLineNumber());
-    }
-}
-
 
 void LogArea::showFindNoResultsMessage()
 {
