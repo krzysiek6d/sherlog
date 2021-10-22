@@ -1,10 +1,9 @@
-#ifndef MYTAB_H
-#define MYTAB_H
+#pragma once
 
 #include <QWidget>
 #include <logarea.h>
 #include <memory>
-#include <filecontents.h>
+#include <fileview.h>
 
 namespace Ui {
 class MyTab;
@@ -19,7 +18,7 @@ class MyTab : public QWidget
     Q_OBJECT
 
 public:
-    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileContents, MyTab* filterSource);
+    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource);
     ~MyTab();
 
     void showEvent( QShowEvent* event );
@@ -39,11 +38,9 @@ private:
     void focusGrep();
     void bookmark();
     TabContainer *parent;
-    FileView fileContents_;
+    FileView fileView_;
     LogArea* editor;
     DocumentTab* tabWithFilename;
     Ui::MyTab *ui;
     MyTab* filterSource_;
 };
-
-#endif // MYTAB_H

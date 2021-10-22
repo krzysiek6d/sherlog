@@ -3,6 +3,7 @@
 #include "mytab.h"
 #include <config.h>
 #include <documenttab.h>
+#include <iostream>
 
 
 TabContainer::TabContainer(QWidget *parent, DocumentTab* documentTab, const FileView& fileContents, MyTab* filterSource) :

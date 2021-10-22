@@ -1,6 +1,6 @@
 #include "mytab.h"
 #include "ui_mytab.h"
-#include "filecontents.h"
+#include "fileview.h"
 #include <QTextCursor>
 #include <QTextBlock>
 #include <tabcontainer.h>
@@ -9,12 +9,13 @@
 #include <documenttab.h>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <iostream>
 
-MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileContents, MyTab* filterSource) :
+MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource) :
     QWidget(parent),
     parent(parent),
-    fileContents_{std::move(fileContents)},
-    editor(new LogArea(this, fileContents_)),
+    fileView_{std::move(fileView)},
+    editor(new LogArea(this, fileView_)),
     tabWithFilename{tabWithFilename},
     ui(new Ui::MyTab),
     filterSource_{filterSource}
@@ -117,7 +118,7 @@ void MyTab::on_grepInput_returnPressed()
     auto regex = this->ui->grepRegex->isChecked();
     QString optionsStr = QString(" [") + (matchCase ? "C" : "c") + (regex ? "X" : "x") + (reverse ? "R" : "r") + "]";
 
-    FileView view = fileContents_;
+    FileView view = fileView_;
     view.filter(textToSearch, matchCase, reverse, regex);
 
     parent->addTab(view, newTabName + optionsStr, this);

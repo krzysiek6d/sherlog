@@ -1,6 +1,7 @@
 #pragma once
+
 #include <QWidget>
-#include <filecontents.h>
+#include <fileview.h>
 #include <memory>
 #include <QListWidgetItem>
 

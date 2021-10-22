@@ -31,7 +31,9 @@ SOURCES += \
     tabcontainer.cpp \
     config.cpp \
     documenttab.cpp \
-    highlighter.cpp
+    highlighter.cpp \
+    filecontents.cpp \
+    fileview.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -42,7 +44,9 @@ HEADERS += \
     mytab.h \
     timer.h \
     documenttab.h \
-    highlighter.h
+    highlighter.h \
+    line.h \
+    fileview.h
 
 FORMS += \
     mainwindow.ui \
@@ -54,4 +58,5 @@ CONFIG += static
 #CONFIG += sanitizer sanitize_address
 
 QMAKE_CXXFLAGS += -std=c++2a
-QMAKE_LFLAGS += -static-libstdc++
+QMAKE_LFLAGS_DEBUG += -static-libstdc++ -static-libgcc
+QMAKE_LFLAGS_RELEASE += -static-libstdc++ -static-libgcc

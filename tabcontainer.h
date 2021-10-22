@@ -1,8 +1,7 @@
-#ifndef TABCONTAINER_H
-#define TABCONTAINER_H
+#pragma once
 
 #include <QWidget>
-#include <filecontents.h>
+#include <fileview.h>
 #include <memory>
 
 namespace Ui {
@@ -28,5 +27,3 @@ private:
     std::unique_ptr<Ui::TabContainer> ui;
     DocumentTab* documentTab;
 };
-
-#endif // TABCONTAINER_H

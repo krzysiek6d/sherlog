@@ -5,6 +5,7 @@
 #include <config.h>
 #include <iostream>
 #include <QShortcut>
+#include <filecontents.h>
 
 
 DocumentTab::DocumentTab(QWidget *parent, const FileContents& fileContents) :

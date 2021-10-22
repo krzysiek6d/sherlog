@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <QFont>
 #include <QKeySequence>
@@ -23,5 +22,3 @@ public:
     static QKeySequence gotoLineShorcut();
     static QKeySequence bookmarkShorcut();
 };
-
-#endif // CONFIG_H

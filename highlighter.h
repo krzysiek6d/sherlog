@@ -1,5 +1,4 @@
-#ifndef HIGHLIGHTER_H
-#define HIGHLIGHTER_H
+#pragma once
 
 #include <QTextDocument>
 #include <QString>
@@ -21,5 +20,3 @@ private:
     std::vector<std::pair<QString, QColor>> highLightingPatterns;
     std::vector<int> highlightedBlocks;
 };
-
-#endif // HIGHLIGHTER_H

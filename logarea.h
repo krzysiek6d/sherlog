@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QPlainTextEdit>
-#include "filecontents.h"
+#include "fileview.h"
 #include <memory>
 #include <QShortcut>
 #include "highlighter.h"

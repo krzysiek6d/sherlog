@@ -13,7 +13,6 @@ public:
         : function_name_{func}
         , start_{ClockType::now()}
     {
-
     }
     Timer(const Timer&) = delete;
     Timer(Timer&&) = delete;
