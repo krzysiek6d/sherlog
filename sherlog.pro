@@ -46,7 +46,8 @@ HEADERS += \
     documenttab.h \
     highlighter.h \
     line.h \
-    fileview.h
+    fileview.h \
+    bookmark.h
 
 FORMS += \
     mainwindow.ui \

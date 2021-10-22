@@ -4,17 +4,12 @@
 #include <fileview.h>
 #include <memory>
 #include <QListWidgetItem>
+#include <bookmark.h>
 
 namespace Ui {
 class documentTab;
 }
 class MyTab;
-
-struct Bookmark
-{
-    int linenum;
-    QString text;
-};
 
 class DocumentTab : public QWidget
 {
