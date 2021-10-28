@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-TabContainer::TabContainer(QWidget *parent, DocumentTab* documentTab, const FileView& fileContents, MyTab* filterSource, Highlighter& highlighter) :
+TabContainer::TabContainer(QWidget *parent, DocumentTab* documentTab, const FileView& fileContents, MyTab* filterSource, std::shared_ptr<Highlighter> highlighter) :
     QWidget(parent),
     ui(new Ui::TabContainer),
     documentTab{documentTab},

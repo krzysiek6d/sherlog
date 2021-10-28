@@ -29,6 +29,6 @@ private:
     std::unique_ptr<Ui::documentTab> ui;
     FileView fileView;
     MyTab* currentTab;
-    Highlighter highlighter;
+    std::shared_ptr<Highlighter> highlighter;
 };
 

@@ -25,7 +25,7 @@ class LogArea : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    LogArea(MyTab *parent, const FileView& fileView, Highlighter& highlighter);
+    LogArea(MyTab *parent, const FileView& fileView, std::shared_ptr<Highlighter> highlighter);
     ~LogArea();
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
@@ -59,8 +59,8 @@ private:
     const FileView& fileView;
     std::unique_ptr<QShortcut> shortcutMark;
     std::unique_ptr<QWidget> lineNumberArea;
-    Highlighter& highlighter;
-    std::unique_ptr<HighlitherDocument> highlighterDocument;
+    std::shared_ptr<Highlighter> highlighter;
+    HighlitherDocument highlighterDocument;
 
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;

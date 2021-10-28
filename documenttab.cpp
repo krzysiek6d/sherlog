@@ -6,6 +6,7 @@
 #include <iostream>
 #include <QShortcut>
 #include <filecontents.h>
+#include <memory>
 
 
 DocumentTab::DocumentTab(QWidget *parent, const FileContents& fileContents) :
@@ -13,7 +14,7 @@ DocumentTab::DocumentTab(QWidget *parent, const FileContents& fileContents) :
     ui(new Ui::documentTab),
     fileView(fileContents),
     currentTab(nullptr),
-    highlighter{}
+    highlighter{std::make_shared<Highlighter>()}
 {
     ui->setupUi(this);
     ui->lineEdit->setText(fileContents.filename());

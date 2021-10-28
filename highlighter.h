@@ -14,6 +14,7 @@ class Highlighter
 {
 public:
     Highlighter();
+    ~Highlighter();
     void addToHighLights(const QString& text);
     const std::vector<std::pair<QString, QColor>>& getHighLightingPatterns() const;
     void subscribeDocument(HighlitherDocument* ptr);

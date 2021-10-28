@@ -21,6 +21,11 @@ Highlighter::Highlighter()
         availableColors.insert({color, true});
 }
 
+Highlighter::~Highlighter()
+{
+    std::cout << "deleting Highlighter, size of documents is: " << documents.size() << std::endl;
+}
+
 void Highlighter::subscribeDocument(HighlitherDocument* ptr)
 {
     documents.insert(ptr);
@@ -28,7 +33,9 @@ void Highlighter::subscribeDocument(HighlitherDocument* ptr)
 
 void Highlighter::unsubscribeDocument(HighlitherDocument* ptr)
 {
-    documents.erase(ptr);
+    auto it = documents.find(ptr);
+    if (it != documents.end())
+        documents.erase(it);
 }
 
 void Highlighter::addToHighLights(const QString& selectedText)

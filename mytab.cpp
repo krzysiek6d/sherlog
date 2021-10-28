@@ -11,7 +11,7 @@
 #include <QScrollBar>
 #include <iostream>
 
-MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource, Highlighter& highlighter) :
+MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource, std::shared_ptr<Highlighter> highlighter) :
     QWidget(parent),
     parent(parent),
     fileView_{std::move(fileView)},

@@ -3,17 +3,20 @@
 
 const int repaintBlockSize = 100;
 
-HighlitherDocument::HighlitherDocument(QTextDocument& document, Highlighter& highlighter)
+HighlitherDocument::HighlitherDocument(QTextDocument& document, std::shared_ptr<Highlighter> highlighter)
     : document_{document}
     , highlighter_{highlighter}
 {
-    highlighter_.subscribeDocument(this);
+    std::cout << "creating HighlitherDocument, this addr is " << static_cast<void*>(this) << std::endl;
+    highlighter_->subscribeDocument(this);
     clearHighlightingCache();
 }
 
 HighlitherDocument::~HighlitherDocument()
 {
-    highlighter_.unsubscribeDocument(this);
+    std::cout << "deleting HighlitherDocument, this addr is " << static_cast<void*>(this) << std::endl;
+    highlighter_->unsubscribeDocument(this);
+    std::cout << "deleted HighlitherDocument, this addr is " << static_cast<void*>(this) << std::endl;
 }
 
 void HighlitherDocument::clearHighlightingCache()
@@ -37,7 +40,7 @@ void HighlitherDocument::highlight(QTextBlock blk)
     {
         highlightedBlocks[blkNum / repaintBlockSize] = 1;
 
-        const auto& highLightingPatterns = highlighter_.getHighLightingPatterns();
+        const auto& highLightingPatterns = highlighter_->getHighLightingPatterns();
 
         int i = 0;
         while (blk.isValid() && i < max) {

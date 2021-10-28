@@ -19,7 +19,7 @@ class MyTab : public QWidget
     Q_OBJECT
 
 public:
-    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource, Highlighter& highlighter);
+    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource, std::shared_ptr<Highlighter> highlighter);
     ~MyTab();
 
     void showEvent( QShowEvent* event );
