@@ -11,6 +11,7 @@ class MyTab;
 
 class TabContainer;
 class DocumentTab;
+class Highlighter;
 
 class MyTab : public QWidget
 {
@@ -18,7 +19,7 @@ class MyTab : public QWidget
     Q_OBJECT
 
 public:
-    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource);
+    MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource, Highlighter& highlighter);
     ~MyTab();
 
     void showEvent( QShowEvent* event );

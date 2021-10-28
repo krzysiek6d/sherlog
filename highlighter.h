@@ -6,17 +6,20 @@
 #include <map>
 #include <QColor>
 #include <QTextBlock>
+#include <set>
+
+class HighlitherDocument;
 
 class Highlighter
 {
 public:
-    Highlighter(QTextDocument& document);
+    Highlighter();
     void addToHighLights(const QString& text);
-    void highlight(QTextBlock blk);
+    const std::vector<std::pair<QString, QColor>>& getHighLightingPatterns() const;
+    void subscribeDocument(HighlitherDocument* ptr);
+    void unsubscribeDocument(HighlitherDocument* ptr);
 private:
-    QTextDocument& document_;
-
     std::map<QColor, bool> availableColors;
     std::vector<std::pair<QString, QColor>> highLightingPatterns;
-    std::vector<int> highlightedBlocks;
+    std::set<HighlitherDocument*> documents;
 };

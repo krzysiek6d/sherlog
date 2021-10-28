@@ -12,11 +12,12 @@ DocumentTab::DocumentTab(QWidget *parent, const FileContents& fileContents) :
     QWidget(parent),
     ui(new Ui::documentTab),
     fileView(fileContents),
-    currentTab(nullptr)
+    currentTab(nullptr),
+    highlighter{}
 {
     ui->setupUi(this);
     ui->lineEdit->setText(fileContents.filename());
-    auto container = new TabContainer(this, this, fileView, nullptr);
+    auto container = new TabContainer(this, this, fileView, nullptr, highlighter);
     ui->splitter->addWidget(container);
     ui->splitter->setSizes(QList<int>() << 1 << 1); // dont know how it works but it sets size properly ;D
 

@@ -1,6 +1,7 @@
 #include "highlighter.h"
 #include "config.h"
 #include <iostream>
+#include "highlitherdocument.h"
 
 const int repaintBlockSize = 100;
 
@@ -14,11 +15,20 @@ bool operator<(const QColor& l, const QColor& r)
     return lVal < rVal;
 }
 
-Highlighter::Highlighter(QTextDocument& document)
-    : document_{document}
+Highlighter::Highlighter()
 {
     for(const auto& color: Config::getMarkingColors())
         availableColors.insert({color, true});
+}
+
+void Highlighter::subscribeDocument(HighlitherDocument* ptr)
+{
+    documents.insert(ptr);
+}
+
+void Highlighter::unsubscribeDocument(HighlitherDocument* ptr)
+{
+    documents.erase(ptr);
 }
 
 void Highlighter::addToHighLights(const QString& selectedText)
@@ -57,51 +67,12 @@ void Highlighter::addToHighLights(const QString& selectedText)
     }
     std::cout << "selected text: " << selectedText.toStdString() << std::endl;
 
-    auto numOfBlocks = document_.blockCount() / 100 + 1;
-    highlightedBlocks = std::vector<int>(numOfBlocks, 0);
+    for (auto doc: documents)
+        doc->clearHighlightingCache();
 }
 
-void Highlighter::highlight(QTextBlock blk)
+const std::vector<std::pair<QString, QColor>>& Highlighter::getHighLightingPatterns() const
 {
-    if (highlightedBlocks.empty())
-        return;
-
-    auto blkNum = blk.blockNumber();
-    blk = document_.findBlockByLineNumber(blkNum / repaintBlockSize * repaintBlockSize);
-    auto max = repaintBlockSize * 2;
-
-    if (highlightedBlocks[blkNum / repaintBlockSize] == 0 )
-    {
-        highlightedBlocks[blkNum / repaintBlockSize] = 1;
-
-        int i = 0;
-        while (blk.isValid() && i < max) {
-
-            auto text = blk.text();
-
-            QTextCharFormat clearFormat;
-            QTextCursor cursor(blk);
-            cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-            cursor.setCharFormat(clearFormat);
-            for (const auto& [pattern, color]: highLightingPatterns)
-            {
-                QTextCharFormat myClassFormat;
-                myClassFormat.setFontWeight(QFont::Bold);
-                myClassFormat.setBackground(color);
-
-                int j = 0;
-                while ((j = text.indexOf(pattern, j, Qt::CaseInsensitive)) != -1) {
-
-                    QTextCursor tempCursor(blk);
-                    tempCursor.setPosition(blk.begin().fragment().position() + j);
-                    tempCursor.setPosition(blk.begin().fragment().position() + j + pattern.length(), QTextCursor::KeepAnchor);
-                    tempCursor.setCharFormat(myClassFormat);
-                    ++j;
-                }
-
-            }
-            i++;
-            blk = blk.next();
-        }
-    }
+    return highLightingPatterns;
 }
+

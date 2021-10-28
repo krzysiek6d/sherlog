@@ -6,10 +6,11 @@
 #include <iostream>
 
 
-TabContainer::TabContainer(QWidget *parent, DocumentTab* documentTab, const FileView& fileContents, MyTab* filterSource) :
+TabContainer::TabContainer(QWidget *parent, DocumentTab* documentTab, const FileView& fileContents, MyTab* filterSource, Highlighter& highlighter) :
     QWidget(parent),
     ui(new Ui::TabContainer),
-    documentTab{documentTab}
+    documentTab{documentTab},
+    highlighter{highlighter}
 {
     ui->setupUi(this);
     setFont(Config::getNormalFont());
@@ -20,7 +21,7 @@ TabContainer::TabContainer(QWidget *parent, DocumentTab* documentTab, const File
     ui->tabWidget->setFont(Config::getNormalFont());
     ui->tabWidget->setStyleSheet("QTabBar::tab { height: 22px; }");
 
-    auto baseTab = new MyTab(this, documentTab, fileContents, filterSource);  // deletion is done by tabcloserequest
+    auto baseTab = new MyTab(this, documentTab, fileContents, filterSource, highlighter);  // deletion is done by tabcloserequest
     ui->tabWidget->addTab(baseTab, "Base");
     ui->tabWidget->tabBar()->tabButton(0, QTabBar::RightSide)->resize(0, 0);
 }
@@ -31,7 +32,7 @@ TabContainer::~TabContainer()
 
 void TabContainer::addTab(const FileView& fileContents, const QString& tabName, MyTab* filterSource)
 {
-    auto filteredTab = new TabContainer(this, documentTab, fileContents, filterSource);
+    auto filteredTab = new TabContainer(this, documentTab, fileContents, filterSource, highlighter);
     ui->tabWidget->addTab(filteredTab, tabName); // deletion is done by tabcloserequest
 }
 

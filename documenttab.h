@@ -5,6 +5,7 @@
 #include <memory>
 #include <QListWidgetItem>
 #include <bookmark.h>
+#include <highlighter.h>
 
 namespace Ui {
 class documentTab;
@@ -28,5 +29,6 @@ private:
     std::unique_ptr<Ui::documentTab> ui;
     FileView fileView;
     MyTab* currentTab;
+    Highlighter highlighter;
 };
 

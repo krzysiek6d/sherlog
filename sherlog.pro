@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = aaa
+TARGET = sherlog
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -33,7 +33,8 @@ SOURCES += \
     documenttab.cpp \
     highlighter.cpp \
     filecontents.cpp \
-    fileview.cpp
+    fileview.cpp \
+    highlitherdocument.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     highlighter.h \
     line.h \
     fileview.h \
-    bookmark.h
+    bookmark.h \
+    highlitherdocument.h
 
 FORMS += \
     mainwindow.ui \

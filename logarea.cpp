@@ -19,13 +19,14 @@
 #include <timer.h>
 
 
-LogArea::LogArea(MyTab *parent, const FileView& fileView) :
+LogArea::LogArea(MyTab *parent, const FileView& fileView, Highlighter& highlighter) :
     QPlainTextEdit(parent),
     parent{parent},
     fileView{fileView},
     shortcutMark{std::make_unique<QShortcut>(Config::markShorcut(), this)},
     lineNumberArea{std::make_unique<LineNumberArea>(this)},
-    highlighter{std::make_unique<Highlighter>(*document())}
+    highlighter{highlighter},
+    highlighterDocument{std::make_unique<HighlitherDocument>(*document(), highlighter)}
 {
     MEASURE_FUNCTION();
     setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -207,13 +208,13 @@ QString LogArea::getSelectedText()
 
 void LogArea::highlightWords()
 {
-    highlighter->addToHighLights(textCursor().selectedText().toLower());
-    highlighter->highlight(firstVisibleBlock());
+    highlighter.addToHighLights(textCursor().selectedText().toLower());
+    highlighterDocument->highlight(firstVisibleBlock());
 }
 
 void LogArea::paintEvent( QPaintEvent* event ) {
     QPlainTextEdit::paintEvent( event );
-    highlighter->highlight(firstVisibleBlock());
+    highlighterDocument->highlight(firstVisibleBlock());
 }
 
 int LogArea::getCurrentBlockNumber()

@@ -5,6 +5,7 @@
 #include <memory>
 #include <QShortcut>
 #include "highlighter.h"
+#include "highlitherdocument.h"
 
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -24,7 +25,7 @@ class LogArea : public QPlainTextEdit
     Q_OBJECT
 
 public:
-    LogArea(MyTab *parent, const FileView& fileView);
+    LogArea(MyTab *parent, const FileView& fileView, Highlighter& highlighter);
     ~LogArea();
 
     void lineNumberAreaPaintEvent(QPaintEvent *event);
@@ -58,7 +59,8 @@ private:
     const FileView& fileView;
     std::unique_ptr<QShortcut> shortcutMark;
     std::unique_ptr<QWidget> lineNumberArea;
-    std::unique_ptr<Highlighter> highlighter;
+    Highlighter& highlighter;
+    std::unique_ptr<HighlitherDocument> highlighterDocument;
 
     int lineNumberAreaWidth_;
     std::vector<QString> lineNumbers;

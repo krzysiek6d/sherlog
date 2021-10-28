@@ -11,11 +11,11 @@
 #include <QScrollBar>
 #include <iostream>
 
-MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource) :
+MyTab::MyTab(TabContainer *parent, DocumentTab* tabWithFilename, FileView fileView, MyTab* filterSource, Highlighter& highlighter) :
     QWidget(parent),
     parent(parent),
     fileView_{std::move(fileView)},
-    editor(new LogArea(this, fileView_)),
+    editor(new LogArea(this, fileView_, highlighter)),
     tabWithFilename{tabWithFilename},
     ui(new Ui::MyTab),
     filterSource_{filterSource}

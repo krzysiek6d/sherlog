@@ -10,13 +10,14 @@ class TabContainer;
 }
 class DocumentTab;
 class MyTab;
+class Highlighter;
 
 class TabContainer : public QWidget
 {
     Q_OBJECT
 
 public:
-    TabContainer(QWidget *parent, DocumentTab* documentTab, const FileView& fileContents, MyTab* filterSource);
+    TabContainer(QWidget *parent, DocumentTab* documentTab, const FileView& fileContents, MyTab* filterSource, Highlighter& highlighter);
     void addTab(const FileView& fileContents, const QString& tabName, MyTab* filterSource);
     void switchTab(MyTab* tab);
     ~TabContainer();
@@ -26,4 +27,5 @@ private:
 
     std::unique_ptr<Ui::TabContainer> ui;
     DocumentTab* documentTab;
+    Highlighter& highlighter;
 };
